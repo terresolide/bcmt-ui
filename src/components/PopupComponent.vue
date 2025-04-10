@@ -22,7 +22,7 @@
           <div v-if="mode === 'popup' && intermagnet && intermagnet!=='false'" style="width:120px;display:inline-block;vertical-align:top;text-align:center;padding-bottom:5px;font-size:9px;">
             <template v-if="intermagnet === 'true'"> 
               <a href="https://intermagnet.org/" target="_blank">
-                <img src="../assets/images/intermagnet-logo.png" width="30"> <br>
+                <img src="@/assets/images/intermagnet-logo.png" width="30"> <br>
                 INTERMAGNET
               </a>
             </template>

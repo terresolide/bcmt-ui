@@ -9,13 +9,14 @@
         <label style="width:150px;display:inline-block;">Data type </label>
           <select v-model="data.dataType" @change="paramsChange('dataType')">
             <option value="">---</option>
-            <option v-for="item in data.dataTypes" :value="item.value">{{item.name}}</option>
+            <option v-for="item in data.dataTypes" :value="item.value" >{{item.name}}</option>
           </select>
           <select v-if="data.dataType && data.dataTypes[data.dataType]" v-model="data.observedProperty" @change="paramsChange('observed')">
             <option value="">---</option>
             <option  v-for="item in data.dataTypes[data.dataType].list" :value="item.frequency" >{{item.frequency}}</option>
           </select>
         </div>
+        <div><label>Show most available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
          <div><label style="width:60px;display:inline-block;">End</label> <input type="date" v-model="data.end" /> </div>
         <div>
           <label style="width:150px;display:inline-block;">Sampling period </label>
@@ -285,6 +286,9 @@ function getFiles () {
     .then(json => {
       if (json.value) {
         data.files = json.value
+        if (data.available) {
+            
+        }
        
       }
       if (json['@iot.count']) {
@@ -369,6 +373,12 @@ function paramsChange (param) {
           delete query.sampling
         }
         break
+      case 'available':
+          if (data.available) {
+              query.available = data.available
+          } else {
+              delete query.available
+          }
       case 'sensor':
         if (data.sensor) {
           query.sensor = data.sensor
@@ -400,6 +410,9 @@ onBeforeMount(() => {
    if (query.sampling) {
     data.frequency = query.sampling
    }
+   if (query.available) {
+       data.available = true
+    }
   
    getStation()
  
@@ -451,7 +464,7 @@ onBeforeMount(() => {
 .station-form {
   display: grid;
  /* grid-template-columns: 100px minmax(150px,1fr) minmax(150px,1fr) 125px minmax(150px,1fr);*/
-  grid-template-columns: 1fr 1fr ;
+  grid-template-columns: 0.65fr 1fr  0.65fr;
   grid-gap: 5px;
   line-height:1;
   grid-template-rows: 18px 18px; 
