@@ -285,11 +285,26 @@ function getFiles () {
     })
     .then(json => {
       if (json.value) {
-        data.files = json.value
+        
         if (data.available) {
-            
+            // group by date and min or sec or hour or day
+            var groups = {}
+            var regex = /^[a-z]{3}([0-9]{8})[^\.]*\.([a-z]+)$/
+            json.value.forEach((ds) => {
+                console.log(ds.name)
+                var matches = ds.name.match(regex)
+                if (matches) {
+                    var key = matches[1]+matches[2]
+                    if (!groups[key]) {
+                        groups[key] = [ds]
+                    } else {
+                        groups[key].push(ds)
+                    }
+                console.log(matches)
+            })
+        } else {
+            data.files = json.value
         }
-       
       }
       if (json['@iot.count']) {
         data.total = json['@iot.count']
