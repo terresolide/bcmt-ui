@@ -210,7 +210,7 @@ function getObservedProperties () {
     fetch(url)
     .then(resp => {
           if (resp.ok) {
-            return resp.json()
+              return resp.json()
             } else {
               return {error : resp.status + ' - ' + resp.statusText}
             }
@@ -300,6 +300,7 @@ function getFiles () {
                     } else {
                         groups[key].push(ds)
                     }
+                }
                 console.log(matches)
             })
         } else {

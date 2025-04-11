@@ -14,8 +14,8 @@
   import iconShadow from '@/assets/images/marker-shadow.png'
   // import stations from '@/data/Things-locations.json'
   import PopupComponent from './PopupComponent.vue'
-  import '../leaflet/leaflet.control.mylayers.js'
-  
+  import '@/leaflet/leaflet.control.mylayers.js'
+  import '@/leaflet/leaflet.control.logo.js'
   import {reactive, ref, onMounted, watch} from 'vue'
   import { useStore } from 'vuex'
   import {useRoute, useRouter} from 'vue-router'
@@ -139,6 +139,9 @@
       data.controlLayer.tiles.arcgisTopo.layer.addTo(data.map)    
       data.controlLayer.addTo(data.map)
       L.control.scale().addTo(data.map)
+      var logo = new L.Control.logo()
+      logo.addTo(data.map)
+      
       data.popup = L.popup({
         autoPan:true, 
         offset: [0,-20],
@@ -282,6 +285,10 @@
       height:500px;
       width:100%;
   }
+  .leaflet-bottom.leaflet-left div.leaflet-control {
+      float: none;
+      display:inline-block;
+  } 
   div.icon-orange span,
   div.icon-blue span {
   color: white;

@@ -3,7 +3,7 @@ import {createStore} from 'vuex'
 // import activation from './modules/activation'
 export default function makeStore(config) {
     var defaultConfig = {
-        api: 'https://catalogue-terresolide.ipgp.fr/bcmt/frost',
+        api: 'http://localhost',
     }
 
     var finalConfig = Object.assign(defaultConfig, config)

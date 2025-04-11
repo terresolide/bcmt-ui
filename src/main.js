@@ -8,8 +8,8 @@ import fr from "moment/dist/locale/fr"
 import makeStore from './store'
 let config = {}
 
-if (typeof activations != 'undefined') {
-  config = JSON.parse(activations.innerHTML)
+if (typeof bcmtConfig != 'undefined') {
+  config = JSON.parse(bcmtConfig.innerHTML)
 } 
 let lang = 'en'
 if (config.lang) {
