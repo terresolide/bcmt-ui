@@ -12,6 +12,8 @@
   import iconBlue from '@/assets/images/marker-icon-blue.png'
   import iconOrange from '@/assets/images/marker-icon-orange.png'
   import iconShadow from '@/assets/images/marker-shadow.png'
+  import bcmtFavicon from '@/assets/images/bcmt.png'
+  import formaterreFavicon from '@/assets/images/formater.png'
   // import stations from '@/data/Things-locations.json'
   import PopupComponent from './PopupComponent.vue'
   import '@/leaflet/leaflet.control.mylayers.js'
@@ -139,7 +141,7 @@
       data.controlLayer.tiles.arcgisTopo.layer.addTo(data.map)    
       data.controlLayer.addTo(data.map)
       L.control.scale().addTo(data.map)
-      var logo = new L.Control.logo(store.state.logo)
+      var logo = new L.Control.logo(store.state.logo, store.state.logo === 'bcmt' ? bcmtFavicon : formaterreFavicon)
       logo.addTo(data.map)
       
       data.popup = L.popup({
@@ -150,9 +152,9 @@
         closeButton: false
       })
       data.popup.setContent(popup.value)
-      data.map.whenReady(function (e) {
-         setTimeout(scrollTop, 1000)
-      })
+      // data.map.whenReady(function (e) {
+      //    setTimeout(scrollTop,1000)
+      // })
       data.map.on('click', function (e) {
         router.push({name: 'map'})
       })
@@ -167,6 +169,11 @@
       .then(json => {
           displayStations(json)
           data.map.invalidateSize()
+          scrollTop()
+      })
+      .catch(err => {
+           data.map.invalidateSize()
+           scrollTop()
       })
   }
   function addStation(station) {
@@ -279,7 +286,7 @@
   watch( () => props.height, (height) => {
     if (data.map) {
 	    data.map.invalidateSize()
-        scrollTop()
+        // scrollTop()
     }
   })
   watch(route, () => {
