@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 
-import {reactive, onMounted, onBeforeUnmount} from 'vue'
+import {reactive, onActivated, onMounted, onBeforeUnmount} from 'vue'
 import MapComponent from './components/MapComponent.vue'
 const data = reactive({
     height: 600,
@@ -9,6 +9,7 @@ const data = reactive({
 })
 function initSize () {
     data.height = window.innerHeight
+    
 }
 onMounted(() => {
     data.resizeListener = initSize.bind()
@@ -19,6 +20,7 @@ onBeforeUnmount(() => {
     window.removeEventListener('resize', data.resizeListener)
     data.resizeListener = null
 })
+
 </script>
 
 <template>

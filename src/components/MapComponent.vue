@@ -139,7 +139,7 @@
       data.controlLayer.tiles.arcgisTopo.layer.addTo(data.map)    
       data.controlLayer.addTo(data.map)
       L.control.scale().addTo(data.map)
-      var logo = new L.Control.logo()
+      var logo = new L.Control.logo(store.state.logo)
       logo.addTo(data.map)
       
       data.popup = L.popup({
@@ -150,6 +150,9 @@
         closeButton: false
       })
       data.popup.setContent(popup.value)
+      data.map.whenReady(function (e) {
+         setTimeout(scrollTop, 1000)
+      })
       data.map.on('click', function (e) {
         router.push({name: 'map'})
       })
@@ -265,9 +268,18 @@
       return
      
   }
+  function scrollTop() {
+      console.log('scroll top')
+      var top = document.querySelector('#app')
+   
+      if (top) {
+            top.scrollIntoView({ behavior: 'smooth' });
+      }
+  }
   watch( () => props.height, (height) => {
     if (data.map) {
 	    data.map.invalidateSize()
+        scrollTop()
     }
   })
   watch(route, () => {
@@ -288,7 +300,30 @@
   .leaflet-bottom.leaflet-left div.leaflet-control {
       float: none;
       display:inline-block;
+      vertical-align:middle;
+      border:none;
+  }
+ .leaflet-bottom.leaflet-left div.leaflet-control.logo-control a {
+      width:120px;
+      background-color:transparent;
+      margin-right:5px;
   } 
+ .leaflet-bottom.leaflet-left div.leaflet-control.logo-control a.bcmt-logo {
+     background-color:rgba(255,255,255,0.5);
+     height:35px;
+ }
+.leaflet-bottom.leaflet-left div.leaflet-control.logo-control img {
+      width:35px;
+      display:inline-block;
+      vertical-align:middle;
+      background-color:transparent;
+  } 
+.leaflet-bottom.leaflet-left div.leaflet-control.logo-control span {
+      max-width:calc(100% - 40px);
+      display:inline-block;
+      vertical-align:middle;
+      line-height:1;
+  }     
   div.icon-orange span,
   div.icon-blue span {
   color: white;

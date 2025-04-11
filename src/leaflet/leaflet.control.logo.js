@@ -17,14 +17,15 @@ L.Control.logo = L.Control.extend({
         var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control logo-control');
         var button = L.DomUtil.create('a', '', container);
         button.setAttribute('target', '_blank')
-        if (this.mode === 'bcmt') {
+        if (this._mode === 'bcmt') {
             button.setAttribute('href', 'https://www.bcmt.fr')
-            button.innerHTML = '<img width="100%" class="logo-control-img" src="' + bcmt + '"> ';
+            button.setAttribute('class', 'bcmt-logo')
+            button.innerHTML = '<img width="100%" class="logo-control-img" src="' + bcmt + '"> <span>Data from BCMT</span>';
             L.DomEvent.disableClickPropagation(button);
             container.title = "Data from BCMT";
         } else {
            button.setAttribute('href', 'https://www.poleterresolide.fr')
-           button.innerHTML = '<img width="100%" class="logo-control-img" src="' + formaterre + '"> ';
+           button.innerHTML = '<img width="100%" class="logo-control-img" src="' + formaterre + '"> <span>Developped by<br>FormaTerre</span>';
            L.DomEvent.disableClickPropagation(button);
            container.title = "Developped by FormaTerre";
         }

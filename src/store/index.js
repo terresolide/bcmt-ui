@@ -4,6 +4,7 @@ import {createStore} from 'vuex'
 export default function makeStore(config) {
     var defaultConfig = {
         api: 'http://localhost',
+        logo: 'formaterre'
     }
 
     var finalConfig = Object.assign(defaultConfig, config)
