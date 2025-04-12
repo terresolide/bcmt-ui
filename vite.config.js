@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 const PACKAGE = require('./package.json')
 console.log(PACKAGE.production.url)
 
-var prodUrl = PACKAGE.production.url + '/' + PACKAGE.name + '@' + PACKAGE.version +  '/dist/' ;
+var prodUrl = PACKAGE.production.url + '/' + PACKAGE.name + '@latest/dist/' ;
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
