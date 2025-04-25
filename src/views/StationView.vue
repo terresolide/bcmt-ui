@@ -3,7 +3,7 @@
     <div class="station-page" :class="data.group">
       <PopupComponent :group="data.group" :feature="data.feature" mode="page"></PopupComponent>
       <div class="station-form" style="margin: 10px 0;">
-        <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" /></div>
+        <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
        
         <div>
         <label style="width:150px;display:inline-block;">Data type </label>
@@ -17,7 +17,7 @@
           </select>
         </div>
         <div><label>Show best available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
-         <div><label style="width:60px;display:inline-block;">End</label> <input type="date" v-model="data.end" /> </div>
+         <div><label style="width:60px;display:inline-block;">End</label> <input type="date" v-model="data.end" @change="paramsChange('end')"/> </div>
         <div>
           <label style="width:150px;display:inline-block;">Sampling period </label>
           <select v-model="data.frequency" @change="paramsChange('frequency')">
@@ -79,6 +79,8 @@ const data= reactive({
   observedProperty: '',
   observedProperties: [],
   frequency: '',
+  start: '',
+  end: '',
   frequencies: [],
   paging: {
     offset: 0,
@@ -266,6 +268,12 @@ function getFiles () {
         }
       }
     }
+    if (data.start) {
+      filters.push('properties/end ge \'' + data.start + 'T00:00:00Z\'')
+    }
+    if (data.end) {
+      filters.push('properties/start le \'' + data.end + 'T23:59:59Z\'')
+    }
     if (data.sensor) {
       filters.push('Sensor/@iot.id eq ' + data.sensor)
     }
@@ -352,6 +360,20 @@ function paramsChange (param) {
   var query = Object.assign({}, route.query)
   
   switch (param) {
+    case 'start':
+      if (data.start == '') {
+        delete query.start
+      } else {
+        query.start = data.start
+      }
+    break
+    case 'end':
+      if (data.end == '') {
+        delete query.end
+      } else {
+        query.end = data.end
+      }
+    break
     case 'dataType':
       if (data.dataType === '') {
         delete query.type
@@ -429,7 +451,12 @@ onBeforeMount(() => {
    if (query.available) {
        data.available = true
     }
-  
+    if (query.start) {
+      data.start = query.start
+    }
+    if (query.end) {
+      data.end = query.end
+    }
    getStation()
  
  })
@@ -456,6 +483,12 @@ onBeforeMount(() => {
    }
    if (query.sensor) {
     data.sensor = query.sensor
+   }
+   if (query.start) {
+    data.start = query.start
+   }
+   if (query.end) {
+    data.end = query.end
    }
    getFiles()
 });
