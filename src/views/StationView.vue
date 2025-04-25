@@ -44,7 +44,7 @@
           <option value="100">100 per page</option>
         </select>) &nbsp;
         <span class="bcmt-button" :class="{disabled: to >= data.total}" @click="next">&rsaquo;</span>
-        <span class="bcmt-button" :class="{disabled: to >= data.total}" @click="last">&raquo;</span>
+        <span class="bcmt-button" :class="{disabled: to >= data.total || data.available}" @click="last">&raquo;</span>
       </div>
      <template v-if="data.files.length > 0">
       <div class="header-file">
@@ -390,6 +390,7 @@ function last () {
 function first () {
   var query = Object.assign({}, route.query)
   query.index = 1
+  data.lastIndex = [0]
   query.nb = data.paging.nb
   changeRoute(query)
 }
@@ -456,6 +457,8 @@ function paramsChange (param) {
       } else {
         query.frequency = data.frequency
       }
+      data.lastIndex = [0]
+      query.index = 1
       break
     case 'sampling':
         if (data.sampling) {
@@ -465,12 +468,13 @@ function paramsChange (param) {
         }
         break
     case 'available':
+        data.lastIndex = [0]
+        query.index = 1
         if (data.available) {
           delete query.type
           delete query.op
           query.available = data.available
-          data.lastIndex = [0]
-          query.index = 1
+          
           if (data.frequency) {
             query.frequency = data.frequency
           }
