@@ -16,7 +16,7 @@
             <option  v-for="item in data.dataTypes[data.dataType].list" :value="item.frequency" >{{item.frequency}}</option>
           </select>
         </div>
-        <div><label>Show most available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
+        <div><label>Show best available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
          <div><label style="width:60px;display:inline-block;">End</label> <input type="date" v-model="data.end" /> </div>
         <div>
           <label style="width:150px;display:inline-block;">Sampling period </label>
