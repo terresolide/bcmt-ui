@@ -5,7 +5,7 @@
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
        
-        <div>
+        <div v-if="!data.available">
         <label style="width:150px;display:inline-block;">Data type </label>
           <select v-model="data.dataType" @change="paramsChange('dataType')">
             <option value="">---</option>
@@ -16,13 +16,20 @@
             <option  v-for="item in data.dataTypes[data.dataType].list" :value="item.frequency" >{{item.frequency}}</option>
           </select>
         </div>
+        <div v-else>
+          <label style="width:150px;display:inline-block;">Frequency</label>
+          <select v-model="data.frequency" @change="paramsChange('frequency')">
+            <option value="">---</option>
+            <option v-for="item, key in data.frequencies" :value="key">{{ key }}</option>
+          </select>
+        </div>
         <div><label>Show best available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
          <div><label style="width:60px;display:inline-block;">End</label> <input type="date" v-model="data.end" @change="paramsChange('end')"/> </div>
         <div>
           <label style="width:150px;display:inline-block;">Sampling period </label>
-          <select v-model="data.frequency" @change="paramsChange('frequency')">
+          <select v-model="data.sampling" @change="paramsChange('sampling')">
             <option value="">---</option>
-            <option v-for="item in data.frequencies" :value="item">{{ item }}</option>
+            <option v-for="item in data.samplings" :value="item">{{ item }}</option>
           </select>
         </div>
        
@@ -79,9 +86,11 @@ const data= reactive({
   observedProperty: '',
   observedProperties: [],
   frequency: '',
+  frequencies: {},
   start: '',
   end: '',
-  frequencies: [],
+  sampling: '',
+  samplings: [],
   paging: {
     offset: 0,
     nb: 30
@@ -106,7 +115,7 @@ function initData () {
   data.files = []
   data.sensors = []
   data.observedProperties = []
-  data.frequencies = []
+  data.samplings = []
 }
 function getStation () {
   // init params
@@ -162,7 +171,7 @@ function getStation () {
     json.properties.description = station.description
     data.group = group
     data.feature = json
-    Promise.all([getSensors(), getFrequency(), getObservedProperties()])
+    Promise.all([getSensors(), getSamplings(), getObservedProperties()])
     .then(values => {
       initSize()
       getFiles()}
@@ -192,14 +201,14 @@ function getSensors () {
       })
   })
 }
-function  getFrequency () {
+function  getSamplings () {
   return new Promise((resolve, reject) => {
     var url = server + '/Datastreams?$select=distinct:properties/samplingPeriod&$filter=Thing/@iot.id eq (' + data.id + ')'
     fetch(url)
     .then(resp => resp.json(), err => err)
     .then(json => {
         json.value.forEach(function (item) {
-          data.frequencies.push(item.properties.samplingPeriod)
+          data.samplings.push(item.properties.samplingPeriod)
           
         })
         resolve(true)
@@ -235,13 +244,18 @@ function getObservedProperties () {
                     name: key,
                     list: []}
                 }
-                item.frequency = item.name.replace(key, '')
+                var frequency = item.name.replace(key, '')
+                item.frequency = frequency
                 data.dataTypes[key].list.push(item)
+                if (!data.frequencies[frequency]) {
+                  data.frequencies[frequency] = []
+                }
+                data.frequencies[frequency].push(item['@iot.id'])
                 break
               }
             }
           })
-          
+          console.log(data.frequencies)
           resolve(true)
         }
       })
@@ -253,7 +267,7 @@ function getFiles () {
     var url = server + '/Things(' + data.id + ')/Datastreams?'
     url += '$skip=' + (data.available ? data.lastIndex[data.lastIndex.length - 1] : data.paging.offset) + '&$top=' + data.paging.nb * (data.available ? 3 : 1) + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
     var filters = []
-    if (data.dataType) {
+    if (!data.available && data.dataType) {
       if (data.observedProperty) {
         // verification
         var find = data.dataTypes[data.dataType].list.find(x => x.frequency === data.observedProperty)
@@ -269,6 +283,9 @@ function getFiles () {
           filters.push('(' + observed.join(' or ') + ')')
         }
       }
+    } else if (data.available && data.frequency) {
+      var observed = data.frequencies[data.frequency].map(j => 'ObservedProperty/@iot.id eq ' + j)
+      filters.push('(' + observed.join(' or ') + ')')
     }
     if (data.start) {
       filters.push('properties/end ge \'' + data.start + 'T00:00:00Z\'')
@@ -279,8 +296,8 @@ function getFiles () {
     if (data.sensor) {
       filters.push('Sensor/@iot.id eq ' + data.sensor)
     }
-    if (data.frequency) {
-      filters.push("properties/samplingPeriod eq '" + data.frequency +"'")
+    if (data.sampling) {
+      filters.push("properties/samplingPeriod eq '" + data.sampling +"'")
     }
     if (filters.length > 0) {
       url +='&$filter=' + filters.join(' and ')
@@ -340,9 +357,6 @@ function getFiles () {
         data.total = json['@iot.count']
       }
     })
-}
-function computeOrder (datastream) {
-  
 }
 function next () {
   var query = Object.assign({}, route.query)
@@ -422,7 +436,7 @@ function paramsChange (param) {
         } 
       }
       break
-      case 'observed':
+    case 'observed':
         if (data.observedProperty !== '') {
             var op = data.dataTypes[data.dataType].list.find(x => x.frequency === data.observedProperty)
             if (op) {
@@ -436,27 +450,52 @@ function paramsChange (param) {
               delete query.op
         }
         break;
-      case 'frequency':
-        if (data.frequency) {
-          query.sampling=data.frequency
+    case 'frequency':
+      if (data.frequency === '') {
+        delete query.frequency
+      } else {
+        query.frequency = data.frequency
+      }
+      break
+    case 'sampling':
+        if (data.sampling) {
+          query.sampling=data.sampling
         } else {
           delete query.sampling
         }
         break
-      case 'available':
-          if (data.available) {
-              query.available = data.available
-              data.lastIndex = [0]
-              query.index = 1
-          } else {
-              delete query.available
+    case 'available':
+        if (data.available) {
+          delete query.type
+          delete query.op
+          query.available = data.available
+          data.lastIndex = [0]
+          query.index = 1
+          if (data.frequency) {
+            query.frequency = data.frequency
           }
-      case 'sensor':
-        if (data.sensor) {
-          query.sensor = data.sensor
         } else {
-          delete query.sensor
+          delete query.available
+          delete query.frequency
+          if (data.dataType) {
+            query.type = data.dataType
+          }
+          if (data.observedProperty) {
+            var op = data.dataTypes[data.dataType].list.find(x => x.frequency === data.observedProperty)
+            if (op) {
+              query.op = op.frequency
+            } else {
+              delete query.op
+            }
+          }
         }
+        break
+    case 'sensor':
+      if (data.sensor) {
+        query.sensor = data.sensor
+      } else {
+        delete query.sensor
+      }
         break
   }
   changeRoute(query)
@@ -480,7 +519,10 @@ onBeforeMount(() => {
    //  data.sensor = parseInt(query.sensor)
    // }
    if (query.sampling) {
-    data.frequency = query.sampling
+    data.sampling = query.sampling
+   }
+   if (query.frequency) {
+     data.frequency = query.frequency
    }
    if (query.available) {
        data.available = true
@@ -523,6 +565,9 @@ onBeforeMount(() => {
    }
    if (query.end) {
     data.end = query.end
+   }
+   if (query.frequency) {
+     data.frequency = query.frequency
    }
    if (query.available) {
     data.available = true
