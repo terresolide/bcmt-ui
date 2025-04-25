@@ -57,11 +57,11 @@
   </div>
 </template>
 <script setup>
+import FileComponent from '@/components/FileComponent.vue';
 import PopupComponent from '@/components/PopupComponent.vue';
-import FileComponent from '@/components/FileComponent.vue'
-import {computed, ref, reactive, onBeforeMount, onBeforeUnmount, watch} from 'vue'
-import { useRoute, useRouter, RouterLink } from 'vue-router'
-import { useStore } from 'vuex'
+import { computed, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 const store = useStore()
 const server = store.state.api
 const route = useRoute()
@@ -85,7 +85,8 @@ const data= reactive({
   paging: {
     offset: 0,
     nb: 30
-  }
+  },
+  lastIndex: 0
 })
 const filesNode = ref(null)
 const from = computed(() => {return data.paging.offset + 1})
@@ -239,7 +240,6 @@ function getObservedProperties () {
                 break
               }
             }
-            console.log(data.observedProperties)
           })
           
           resolve(true)
@@ -251,7 +251,7 @@ function getFiles () {
 
     // ?$filter=Sensor/@iot.id eq 2 and ObservedProperty/@iot.id eq 5
     var url = server + '/Things(' + data.id + ')/Datastreams?'
-    url += '$skip=' + data.paging.offset + '&$top=' + data.paging.nb + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
+    url += '$skip=' + (data.available ? data.lastIndex : data.paging.offset) + '&$top=' + data.paging.nb * (data.available ? 3 : 1) + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
     var filters = []
     if (data.dataType) {
       if (data.observedProperty) {
@@ -301,7 +301,6 @@ function getFiles () {
             var groups = {}
             var regex = /^[a-z]{3}([0-9]{8})[^\.]*\.([a-z]+)$/
             json.value.forEach((ds) => {
-                console.log(ds.name)
                 var matches = ds.name.match(regex)
                 if (matches) {
                   var obs = data.observedProperties.find(obs => obs['@iot.id'] === ds.ObservedProperty['@iot.id'])
@@ -315,8 +314,10 @@ function getFiles () {
                   }
                 }
             })
+            var count = 0
             data.files = []
             for(var key in groups) {
+              count += groups[key].length
               groups[key].sort(function (a, b) {
                 if (a.order < b.order ) {
                   return -1
@@ -324,7 +325,12 @@ function getFiles () {
                   return 1
                 }
               })
+
               data.files.push(groups[key][0])
+              if (data.files.length === data.paging.nb) {
+                data.lastIndex += count
+                break
+              }
             }
         } else {
             data.files = json.value
@@ -432,6 +438,8 @@ function paramsChange (param) {
       case 'available':
           if (data.available) {
               query.available = data.available
+              data.lastIndex = 0
+              query.index = 1
           } else {
               delete query.available
           }
