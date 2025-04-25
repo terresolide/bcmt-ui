@@ -86,7 +86,7 @@ const data= reactive({
     offset: 0,
     nb: 30
   },
-  lastIndex: 0
+  lastIndex: [0]
 })
 const filesNode = ref(null)
 const from = computed(() => {return data.paging.offset + 1})
@@ -251,7 +251,7 @@ function getFiles () {
 
     // ?$filter=Sensor/@iot.id eq 2 and ObservedProperty/@iot.id eq 5
     var url = server + '/Things(' + data.id + ')/Datastreams?'
-    url += '$skip=' + (data.available ? data.lastIndex : data.paging.offset) + '&$top=' + data.paging.nb * (data.available ? 3 : 1) + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
+    url += '$skip=' + (data.available ? data.lastIndex[data.lastIndex.length - 1] : data.paging.offset) + '&$top=' + data.paging.nb * (data.available ? 3 : 1) + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
     var filters = []
     if (data.dataType) {
       if (data.observedProperty) {
@@ -328,7 +328,7 @@ function getFiles () {
 
               data.files.push(groups[key][0])
               if (data.files.length === data.paging.nb) {
-                data.lastIndex += count
+                data.lastIndex.push(data.lastIndex[data.lastIndex.length - 1] + count)
                 break
               }
             }
@@ -355,6 +355,14 @@ function previous () {
   var index = from.value - data.paging.nb 
   query.index = index > 0 ? index : 1
   query.nb = data.paging.nb
+  if (data.available) {
+    if (data.lastIndex.length > 2) {
+      data.lastIndex.pop()
+      data.lastIndex.pop()
+    } else {
+      data.lastIndex = [0]
+    }
+  }
   changeRoute(query)
 }
 function last () {
@@ -438,7 +446,7 @@ function paramsChange (param) {
       case 'available':
           if (data.available) {
               query.available = data.available
-              data.lastIndex = 0
+              data.lastIndex = [0]
               query.index = 1
           } else {
               delete query.available
