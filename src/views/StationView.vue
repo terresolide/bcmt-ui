@@ -315,6 +315,7 @@ function getFiles () {
                   }
                 }
             })
+            data.files = []
             for(var key in groups) {
               groups[key].sort(function (a, b) {
                 if (a.order < b.order ) {
@@ -506,6 +507,9 @@ onBeforeMount(() => {
    }
    if (query.end) {
     data.end = query.end
+   }
+   if (query.available) {
+    data.available = true
    }
    getFiles()
 });
