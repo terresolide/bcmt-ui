@@ -207,7 +207,7 @@ function  getFrequency () {
 }
 function getObservedProperties () {
   return new Promise ((resolve, reject) => {
-    var url = server + '/ObservedProperties?$filter=Datastreams/Thing/@iot.id eq ' + data.id 
+    var url = server + '/ObservedProperties?$select=id,name&$filter=Datastreams/Thing/@iot.id eq ' + data.id 
     // var url = server + '/ObservedProperties'
     fetch(url)
     .then(resp => {
@@ -220,12 +220,13 @@ function getObservedProperties () {
       .then(json => {
         if (json.value) {
           // var observedProperties = json.value.filter(x => x.Datastreams.length > 0)
-          var observedProperties = json.value
+          data.observedProperties = json.value
           var tab = ['variation', 'quasidefinitive', 'definitive']
           data.dataTypes = {}
-          observedProperties.forEach(function (item) {
+          data.observedProperties.forEach(function (item, index) {
             for (var i in tab) {
               var key = tab[i]
+              data.observedProperties[index].order = 3 - i
               if (item.name.indexOf(key) >=0 ) {
                 if (!data.dataTypes[key]) {
                   data.dataTypes[key] = {
@@ -238,6 +239,7 @@ function getObservedProperties () {
                 break
               }
             }
+            console.log(data.observedProperties)
           })
           
           resolve(true)
@@ -249,7 +251,7 @@ function getFiles () {
 
     // ?$filter=Sensor/@iot.id eq 2 and ObservedProperty/@iot.id eq 5
     var url = server + '/Things(' + data.id + ')/Datastreams?'
-    url += '$skip=' + data.paging.offset + '&$top=' + data.paging.nb + '&$count=true&$expand=Sensor&$orderBy=name desc'
+    url += '$skip=' + data.paging.offset + '&$top=' + data.paging.nb + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
     var filters = []
     if (data.dataType) {
       if (data.observedProperty) {
@@ -302,15 +304,27 @@ function getFiles () {
                 console.log(ds.name)
                 var matches = ds.name.match(regex)
                 if (matches) {
-                    var key = matches[1]+matches[2]
-                    if (!groups[key]) {
-                        groups[key] = [ds]
-                    } else {
-                        groups[key].push(ds)
-                    }
+                  var obs = data.observedProperties.find(obs => obs['@iot.id'] === ds.ObservedProperty['@iot.id'])
+                  ds.order = obs.order
+                  var key = matches[1]+matches[2]
+                  if (!groups[key]) {
+                      
+                      groups[key] = [ds]
+                  } else {
+                      groups[key].push(ds)
+                  }
                 }
-                console.log(matches)
             })
+            for(var key in groups) {
+              groups[key].sort(function (a, b) {
+                if (a.order < b.order ) {
+                  return -1
+                } else {
+                  return 1
+                }
+              })
+              data.files.push(groups[key][0])
+            }
         } else {
             data.files = json.value
         }
@@ -319,6 +333,9 @@ function getFiles () {
         data.total = json['@iot.count']
       }
     })
+}
+function computeOrder (datastream) {
+  
 }
 function next () {
   var query = Object.assign({}, route.query)
