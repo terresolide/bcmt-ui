@@ -2,6 +2,9 @@
   <div style="background: rgba(0,0,0,0.2);margin:0;padding:10px;">
     <div class="station-page" :class="data.group">
       <PopupComponent :group="data.group" :feature="data.feature" mode="page"></PopupComponent>
+      <template v-if="data.files.length > 0">
+        <GraphComponent :file="data.files[0]" :group="data.group"></GraphComponent>
+      </template>
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
        
@@ -66,6 +69,7 @@
 <script setup>
 import FileComponent from '@/components/FileComponent.vue';
 import PopupComponent from '@/components/PopupComponent.vue';
+import GraphComponent from '@/components/GraphComponent.vue';
 import { computed, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
