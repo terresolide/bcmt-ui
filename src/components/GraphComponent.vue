@@ -9,9 +9,12 @@
 <script setup>
 import BcmtReader from '@/modules/bcmt-reader.js'
 import * as Highcharts from 'highcharts'
+import moment from 'moment'
 import { onBeforeMount, reactive } from 'vue'
-const {file, group} = defineProps({file: Object, group: String})
 
+const {file, group} = defineProps({file: Object, group: String})
+const comps = ["X", "Y", "Z"]
+const colors = {X: "#2caffe", Y: "#544fc5", Y: "#00e272", Z: "#fe6a35"}
 const data = reactive({
     series: null,
     graphs: {X:null, Y:null, Z:null},
@@ -24,6 +27,8 @@ function load () {
         if (done) {
           data.series = reader.getSeries()
           draw('X')
+          draw('Y')
+          draw('Z')
 
         }
     }, (error) => {console.log(error)})
@@ -49,12 +54,14 @@ function draw (comp) {
             id: i
         })
         if (min === null || min > serieData[i]) {
-             min = serie[i]
+             min = serieData[i]
         } 
         if (max === null || max < serieData[i]) {
-            max = serie[i]
+            max = serieData[i]
         } 
     }
+    console.log(dates)
+    console.log(serie)
     data.graphs[comp] = Highcharts.chart(comp + 'comp', {
         chart: {
           zoomType: 'x'
@@ -78,7 +85,7 @@ function draw (comp) {
               return false
             }
             var values = []
-            for (var key in _this.colors) {
+            for (var key in colors) {
               var chart = data.graphs[key];
               if (chart && typeof chart !== 'undefined') {
                  var pt = chart.series[0].points.find(el => el.x === this.point.x )
@@ -87,7 +94,7 @@ function draw (comp) {
                    values.push('<div><span style="color:'+ pt.color +';">&#9632;</span> ' + key + ': ' + (Math.round(pt.y * 1000) / 1000) + '</div>')
                  }
                }
-               if (key !== type && chart) {
+               if (key !== comp && chart) {
                  chart.tooltip.hide();
                }
             }
@@ -115,8 +122,7 @@ function draw (comp) {
                }
              }
            },
-           gridLineWidth: 0,
-           plotLines: plotlines,
+           gridLineWidth: 1
          },
          yAxis: {
              title: {
@@ -132,7 +138,7 @@ function draw (comp) {
          },
          series: [{
              name: comp,
-            // color: color,
+             color: colors[comp],
              type: 'line',
              id: comp,
              zIndex:10,

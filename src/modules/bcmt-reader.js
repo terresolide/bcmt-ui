@@ -50,7 +50,7 @@ class BcmtReader {
 
                 } else if (begin) {
                    var list = line.split(/\s+/)
-                   self.series.dates.push(moment.utc(list[posDate] + 'T' + list[posTime] + 'Z').format('x'))
+                   self.series.dates.push(parseInt(moment.utc(list[posDate] + 'T' + list[posTime] + 'Z').format('x')))
                    coords.forEach(function (letter) {
                     if (pos[letter] < -1) {
                         return Promise.reject('MISSING COLUMN ' + letter)
