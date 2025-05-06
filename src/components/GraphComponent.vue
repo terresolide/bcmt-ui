@@ -64,11 +64,12 @@ function draw (comp) {
     console.log(serie)
     data.graphs[comp] = Highcharts.chart(comp + 'comp', {
         chart: {
-          zoomType: 'x'
+          zoomType: 'x',
+          height: 200
         },
-        title: 'Test',
+        title: file.name,
         width: '680px',
-        height: '200px',
+        
         credits: {
           enabled:false
         },
@@ -78,11 +79,12 @@ function draw (comp) {
         exporting: {
           enabled: false
         },
+        numberFormatter: function (nb) {
+             nb.toLocaleString()
+        },
         tooltip: {
           enabled: true,
-          numberFormatter: function (nb) {
-             nb.toLocaleString()
-          },
+         
           formatter (e) {
             if (!this.point) {
               return false
