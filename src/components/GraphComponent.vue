@@ -1,9 +1,9 @@
 <template>
     le graphe
    <div  class="grah-container" :class="group">
-       <div id="Xcomp"></div>
-       <div id="Ycomp"></div>
-       <div id="Zcomp"></div>
+       <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
+       <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
+       <div id="Zcomp" @mousemove="highlight($event, 'Z')"></div>
     </div>
 </template>
 <script setup>
@@ -32,6 +32,42 @@ function load () {
 
         }
     }, (error) => {console.log(error)})
+}
+function highlight (e, comp) {
+  var chart,
+    point,
+    i,
+    event;
+  var _this = this
+  if (!data.graphs[comp]) {
+    return false
+  }
+  event = data.graphs[comp].pointer.normalize(e);
+  var point = data.graphs[comp].series[0].searchPoint(event, true);
+
+  if (!point) {
+    return
+  }  
+  data.pointDate.date = moment.unix(point.x / 1000).format('ll')
+  data.pointDate[comp] = point.open || point.y
+
+  for (var key in data.graphs) {
+    var chart = data.graphs[key];
+    if (chart && typeof chart !== 'undefined') {
+      var pt = chart.series[0].points.find(el => el.x === point.x )
+      if (pt !== undefined) {
+        data.pointDate[key] = pt.open || pt.y
+      }
+      chart.xAxis[0].removePlotLine('highlight')
+      chart.xAxis[0].addPlotLine({
+        color: '#999999',
+        value:  point.x,
+        width: 1,
+        id: 'highlight'
+      })
+    }
+  } 
+  
 }
 function draw (comp) {
     if (data.graphs[comp]) {
@@ -62,12 +98,16 @@ function draw (comp) {
     }
     console.log(dates)
     console.log(serie)
+    var title = null
+    if (comp === 'X') {
+      title = {text: file.name}
+    }
     data.graphs[comp] = Highcharts.chart(comp + 'comp', {
         chart: {
           zoomType: 'x',
           height: 200
         },
-        title: file.name,
+        title: title,
         width: '680px',
         
         credits: {
