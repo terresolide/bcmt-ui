@@ -80,6 +80,9 @@ function draw (comp) {
         },
         tooltip: {
           enabled: true,
+          numberFormatter: function (nb) {
+             nb.toLocaleString()
+          },
           formatter (e) {
             if (!this.point) {
               return false
