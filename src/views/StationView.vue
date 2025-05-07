@@ -2,8 +2,8 @@
   <div style="background: rgba(0,0,0,0.2);margin:0;padding:10px;">
     <div class="station-page" :class="data.group">
       <PopupComponent :group="data.group" :feature="data.feature" mode="page"></PopupComponent>
-      <template v-if="data.files.length > 0">
-        <GraphComponent :file="data.files[1]" :group="data.group"></GraphComponent>
+      <template v-if="data.selectedFile">
+        <GraphComponent :file="data.selectedFile" :group="data.group" @close="data.selectedFile=null"></GraphComponent>
       </template>
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
@@ -61,15 +61,15 @@
     <template v-else><div style="text-align:center;margin: 20px;"><em>No file found</em></div></template>
       <div ref="filesNode" style="overflow-y:scroll;" >
         
-      <FileComponent v-for="file in data.files" :file="file" :group="data.group"></FileComponent>
+      <FileComponent v-for="file in data.files" :file="file" :group="data.group" @draw="data.selectedFile = file"></FileComponent>
       </div>
     </div>
   </div>
 </template>
 <script setup>
 import FileComponent from '@/components/FileComponent.vue';
-import PopupComponent from '@/components/PopupComponent.vue';
 import GraphComponent from '@/components/GraphComponent.vue';
+import PopupComponent from '@/components/PopupComponent.vue';
 import { computed, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -99,7 +99,8 @@ const data= reactive({
     offset: 0,
     nb: 30
   },
-  lastIndex: [0]
+  lastIndex: [0],
+  selectedFile: null
 })
 const filesNode = ref(null)
 const from = computed(() => {return data.paging.offset + 1})

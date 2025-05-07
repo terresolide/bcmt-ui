@@ -3,7 +3,7 @@
       <div class="download"><a :href="file.properties.file" target="_blank" download>
         <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 384 512"><path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 288c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128z"/></svg>
       </a>
-       <div class="draw" title="Draw"><svg data-name="Layer 1" width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="m.64 11.85-.66-.75 2.57-2.25 2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z"/></svg>
+       <div class="draw" title="Draw" @click="$emit('draw')"><svg data-name="Layer 1" width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="m.64 11.85-.66-.75 2.57-2.25 2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z"/></svg>
        </div>
       </div>
       <div class="title">{{ file.name }}</div>

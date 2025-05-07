@@ -2,7 +2,6 @@ import moment from 'moment'
 
 class BcmtReader {
     constructor(file) {
-        var url = file
         this.file = file
         this.columns = []
         this.data = []
@@ -13,7 +12,7 @@ class BcmtReader {
             Z: []
         }
         this.dates = []
-        this.file = 'https://catalog.formater/tam20250420vmin.min'
+        // this.file = 'https://catalog.formater/tam20250420vmin.min'
         
     }
     getSeries () {

@@ -1,7 +1,7 @@
 <template>
-   <div  class="graph-container" >
-      <h3 :class="group">{{file.name}}
-        <span class="back" @click="close">
+   <div  class="graph-container" ref="graphcontainer" :style="{top: data.top + 'px', left: data.left + 'px'}" >
+      <h3 :class="group" @mousedown="movestart">{{file.name}}
+        <span class="back" @click="$emit('close')">
           &times;
         </span>
       </h3>
@@ -16,35 +16,39 @@
 import BcmtReader from '@/modules/bcmt-reader.js'
 import * as Highcharts from 'highcharts'
 import moment from 'moment'
-import { onBeforeMount, reactive } from 'vue'
+import { onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue'
 
 const {file, group} = defineProps({file: Object, group: String})
 const comps = ["X", "Y", "Z"]
 const colors = {X: "#2caffe", Y: "#544fc5", Y: "#00e272", Z: "#fe6a35"}
 const data = reactive({
+    top: 5,
+    left: 20,
+    pos: {x: 0, y: 0},
+    delta: {x: 0, y: 0},
+    selected: false,
+    mousemoveListener: null,
+    mouseupListener: null,
     series: null,
     graphs: {X:null, Y:null, Z:null},
     pointDate: {date: null, X:null, Y:null, Z:null}
 })
+const graphcontainer = ref(null)
+
 function load () {
     let reader = new BcmtReader(file.properties.file)
     reader.read()
     .then((done) => {
         if (done) {
           data.series = reader.getSeries()
-          draw('X')
-          draw('Y')
-          draw('Z')
-
+          comps.forEach(function (comp) {draw(comp)})
         }
     }, (error) => {console.log(error)})
 }
 function highlight (e, comp) {
   var chart,
     point,
-    i,
     event;
-  var _this = this
   if (!data.graphs[comp]) {
     return false
   }
@@ -180,7 +184,6 @@ function draw (comp) {
 //                _this.syncExtremes(e, type)
 //              },
              afterSetExtremes (e) {
-               console.log(e)
                var xMin = e.min
                var xMax = e.max
                for(var key in data.graphs) {
@@ -220,7 +223,57 @@ function draw (comp) {
          }  
       ]})
 }
-onBeforeMount(() => {load()})
+function initPosition () {
+      data.left = (window.innerWidth - 900) / 2;
+      if (window.innerHeight > 650) {
+        data.top = (window.innerHeight - 650) / 2;
+      }
+      data.pos.x = data.left
+      data.pos.y = graphcontainer.value.offsetTop
+      data.mousemovelistener = document.addEventListener('mousemove', move)
+      data.mouseupListener = document.addEventListener('mouseup', moveEnd)
+    }
+ function movestart (evt) {
+      data.selected = true
+      data.delta = {
+          x: data.pos.x - graphcontainer.value.offsetLeft,
+          y: data.pos.y - graphcontainer.value.offsetTop
+      }
+    }
+  function  move (evt) {
+      data.pos.x = evt.clientX
+      data.pos.y = evt.clientY
+      if (data.selected) {
+        data.left = (data.pos.x - data.delta.x) 
+        if (data.pos.y > data.delta.y) {
+          data.top = (data.pos.y - data.delta.y) 
+        } else {
+          data.top = 0
+        }
+      }
+    }
+  function moveEnd () {
+      data.selected = false
+    }
+onBeforeMount(() => {
+  
+  load()
+  setTimeout(initPosition, 0)
+})
+onBeforeUnmount(() => {
+  if (data.mousemoveListener) {
+    document.removeEventListener('mousemove', move)
+    data.mousemoveListener = null
+  }
+  if (data.mouseupListener) {
+    document.removeEventListener('mouseup', moveEnd)
+    data.mouseupListener = null
+  }
+})
+watch(() => file, 
+  (file) => {
+    load()
+  })
 </script>
 <style>
 .graph-container {
@@ -236,6 +289,9 @@ onBeforeMount(() => {load()})
   border-radius: 10px 10px 0 0;
   max-height:100vh;
   
+}
+.graph-container h3 {
+  cursor: move;
 }
 .graph-container > div {
   max-height:calc(100vh - 45px);
