@@ -96,16 +96,32 @@ function draw (comp) {
             max = serieData[i]
         } 
     }
-    console.log(dates)
-    console.log(serie)
     var title = null
     if (comp === 'X') {
       title = {text: file.name}
     }
+    // date format
+    var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
+    console.log(matches)
+    var formatDate = 'll'
+    if (matches[1]) {
+       switch (matches[1]) {
+        case 'sec':
+          formatDate = 'LTS'
+          break
+        case 'min':
+        case 'hour':
+          formatDate = 'lll'
+          break
+
+       }
+    }
+
     data.graphs[comp] = Highcharts.chart(comp + 'comp', {
         chart: {
-          zoomType: 'x',
-          height: 200
+          zooming:{type: 'x'},
+          height: 200,
+          marginLeft: 120
         },
         title: title,
         width: '680px',
@@ -120,7 +136,7 @@ function draw (comp) {
           enabled: false
         },
         numberFormatter: function (nb) {
-             nb.toLocaleString()
+             return nb.toLocaleString()
         },
         tooltip: {
           enabled: true,
@@ -136,15 +152,15 @@ function draw (comp) {
                  var pt = chart.series[0].points.find(el => el.x === this.point.x )
                  if (pt !== undefined) {
                    data.pointDate[key] = pt.open || pt.y
-                   values.push('<div><span style="color:'+ pt.color +';">&#9632;</span> ' + key + ': ' + (Math.round(pt.y * 1000) / 1000) + '</div>')
+                   values.push('<div><span style="color:'+ pt.color +';">&#9632;</span> ' + key + ': ' + pt.y.toLocaleString() + '</div>')
                  }
                }
                if (key !== comp && chart) {
                  chart.tooltip.hide();
                }
             }
-            data.pointDate.date = moment.unix(this.point.x/ 1000).format('ll')
-            var s = '<b>' + moment.unix(this.point.x/ 1000).format('ll') + '</b><br />'
+            data.pointDate.date = moment.unix(this.point.x/ 1000).format(formatDate)
+            var s = '<b>' + moment.unix(this.point.x/ 1000).format(formatDate) + '</b><br />'
             return s + values.join('<br />')
           },
           shared: false
@@ -158,10 +174,11 @@ function draw (comp) {
 //                _this.syncExtremes(e, type)
 //              },
              afterSetExtremes (e) {
+               console.log(e)
                var xMin = e.min
                var xMax = e.max
                for(var key in data.graphs) {
-                 if (key !== type && data.graphs[key]) {
+                 if (key !== comp && data.graphs[key]) {
                    data.graphs[key].xAxis[0].setExtremes(xMin, xMax, true, false)
                  }
                }
