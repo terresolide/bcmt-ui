@@ -49,18 +49,26 @@
         <span class="bcmt-button" :class="{disabled: to >= data.total}" @click="next">&rsaquo;</span>
         <span class="bcmt-button" :class="{disabled: to >= data.total || data.available}" @click="last">&raquo;</span>
       </div>
-     <template v-if="data.files.length > 0">
+      
+     <template v-if="data.files.length > 0 || loading">
       <div class="header-file">
         <div>Download / Draw</div>
-        <div>Analysis Centre</div>
+        <div>Dates</div>
+        <div style="text-align:left;">Analysis Centre</div>
         <div>DOI</div>
-        <div>Sampling period</div>
+        <div>Sampling</div>
         <div>License</div>
       </div>
+      <template v-if="loading">
+        <div style="text-align:center;margin-top:10px;">
+          <span class="loader"></span>
+        </div>
+      </template>
     </template>
+    
     <template v-else><div style="text-align:center;margin: 20px;"><em>No file found</em></div></template>
       <div ref="filesNode" style="overflow-y:scroll;" >
-        
+      
       <FileComponent v-for="file in data.files" :file="file" :group="data.group" @draw="data.selectedFile = file"></FileComponent>
       </div>
     </div>
@@ -103,6 +111,7 @@ const data= reactive({
   selectedFile: null
 })
 const filesNode = ref(null)
+const loading = ref(false)
 const from = computed(() => {return data.paging.offset + 1})
 const to = computed(() => {return data.paging.offset + data.files.length})
 window.addEventListener('resize', initSize)
@@ -176,11 +185,13 @@ function getStation () {
     json.properties.description = station.description
     data.group = group
     data.feature = json
+    loading.value = true
     Promise.all([getSensors(), getSamplings(), getObservedProperties()])
     .then(values => {
       initSize()
       getFiles()}
     ).catch((reason) => {
+       loading.value = false
        console.log(reason);
     })
   })
@@ -267,7 +278,7 @@ function getObservedProperties () {
   })
 }
 function getFiles () {
-
+    data.files = []
     // ?$filter=Sensor/@iot.id eq 2 and ObservedProperty/@iot.id eq 5
     var url = server + '/Things(' + data.id + ')/Datastreams?'
     url += '$skip=' + (data.available ? data.lastIndex[data.lastIndex.length - 1] : data.paging.offset) + '&$top=' + data.paging.nb * (data.available ? 3 : 1) + '&$count=true&$expand=ObservedProperty($select=@iot.id)&$orderBy=name desc'
@@ -307,11 +318,14 @@ function getFiles () {
     if (filters.length > 0) {
       url +='&$filter=' + filters.join(' and ')
     }
+    loading.value = true
     fetch(url)
     .then(resp => {
+        
         if (resp.ok) {
           return resp.json()
           } else {
+            loading.value = false
             return {error : resp.status + ' - ' + resp.statusText}
           }
     })
@@ -361,6 +375,7 @@ function getFiles () {
       if (json['@iot.count']) {
         data.total = json['@iot.count']
       }
+      loading.value = false
     })
 }
 function next () {
@@ -584,11 +599,32 @@ onBeforeMount(() => {
    getFiles()
 });
 </script>
+<style>
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 5px dotted #333;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 3s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 
+</style>
 <style scoped>
 .header-file {
   display: grid;
  /* grid-template-columns: 130px minmax(150px,1fr) minmax(150px,1fr) 125px minmax(150px,1fr);*/
-  grid-template-columns: 130px 90px minmax(140px,1fr) 90px minmax(140px, 1fr);
+  grid-template-columns: 130px  minmax(170px,1fr)  90px minmax(170px,1fr) 90px 110px;
   grid-gap: px;
   line-height:1;
   grid-template-rows: auto; 
@@ -611,6 +647,7 @@ onBeforeMount(() => {
   /*grid-auto-rows: minmax(100px, auto);*/
   padding:10px 0;
 }
+
 label {
     font-weight:700;
     color: #333;

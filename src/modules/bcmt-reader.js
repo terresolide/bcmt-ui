@@ -12,7 +12,7 @@ class BcmtReader {
             Z: []
         }
         this.dates = []
-        // this.file = 'https://catalog.formater/tam20250420vmin.min'
+        this.file = 'https://catalog.formater/tam20250420vmin.min'
         
     }
     getSeries () {

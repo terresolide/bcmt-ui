@@ -1,7 +1,7 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 
-import {reactive, onActivated, onMounted, onBeforeUnmount} from 'vue'
+import { onBeforeUnmount, onMounted, reactive } from 'vue'
 import MapComponent from './components/MapComponent.vue'
 const data = reactive({
     height: 600,
@@ -43,4 +43,5 @@ onBeforeUnmount(() => {
     width: 100%;
     z-index: 1000;
 }
+
 </style>

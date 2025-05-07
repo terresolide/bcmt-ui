@@ -5,6 +5,7 @@
           &times;
         </span>
       </h3>
+      <div v-if="data.error" style="color:darkred;">{{data.error }}</div>
       <div>
         <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
         <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
@@ -30,12 +31,14 @@ const data = reactive({
     mousemoveListener: null,
     mouseupListener: null,
     series: null,
+    error: null,
     graphs: {X:null, Y:null, Z:null},
     pointDate: {date: null, X:null, Y:null, Z:null}
 })
 const graphcontainer = ref(null)
 
 function load () {
+    data.error = null
     let reader = new BcmtReader(file.properties.file)
     reader.read()
     .then((done) => {
@@ -43,7 +46,9 @@ function load () {
           data.series = reader.getSeries()
           comps.forEach(function (comp) {draw(comp)})
         }
-    }, (error) => {console.log(error)})
+    }, (error) => {
+      data.error = error
+    })
 }
 function highlight (e, comp) {
   var chart,
@@ -92,7 +97,7 @@ function draw (comp) {
     var min = null
     var max = null
      // date format
-     var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
+    var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
     var formatDate = 'll'
     var extension = 'min'
     if (matches[1]) {

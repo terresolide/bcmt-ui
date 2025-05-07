@@ -7,11 +7,16 @@
        </div>
       </div>
       <div class="title">{{ file.name }}</div>
+      <div class="dates">{{ start }}
+        <template v-if="file.properties.samplingPeriod !== 'daily'">
+            <span class="arrow" :class="group">&rarr;</span> {{ end }}
+        </template>
+      </div>
       <div class="center">{{ file.properties.analysisCentre }}</div>
       <div class="doi">
         <a v-if="file.properties.doi" :href="'https://doi.org/' + file.properties.doi" target="_blank">DOI: {{ file.properties.doi }}</a>
       </div>
-      <div class="sampling">{{ file.properties.samplingPeriod }}</div>
+      <div class="sampling">{{extension}}, {{ file.properties.samplingPeriod }}</div>
       <div class="license">
         <template v-if="file.properties.license">
             <template v-if="file.properties.licenseTerms">
@@ -22,18 +27,34 @@
     </div>
 </template>
 <script setup>
+import moment from 'moment'
+import { computed } from 'vue'
 const {file} = defineProps({file: Object, group: String})
+const extension = computed(() => {
+    var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
+    if (matches.length > 1) {
+        return matches[1]
+    }
+    return ''
+})
+const start = computed(() => {
+    return moment(file.properties.start).format('ll')
+})
+const end = computed(() => {
+    return moment(file.properties.end).format('ll')
+})
 </script>
 <style>
 .file {
   display: grid;
  /* grid-template-columns: 100px minmax(150px,1fr) minmax(150px,1fr) 125px minmax(150px,1fr);*/
-  grid-template-columns: 130px 90px minmax(140px,1fr) 90px minmax(140px, 1fr);
+  grid-template-columns: 130px  minmax(170px,1fr)  90px minmax(170px,1fr) 90px 110px;
   grid-gap: 5px;
   line-height:1;
-  grid-template-rows: 18px 18px; 
-  /*grid-auto-rows: minmax(100px, auto);*/
+  grid-template-rows: 18px auto; 
+  grid-auto-rows: minmax(100px, auto);
   font-size: 12px;
+  padding:0 5px;
   border-bottom:1px solid lightgrey;
 }
 .file .title {
@@ -79,7 +100,27 @@ div.draw {
 }
 .bcmtStation div.draw,
 .bcmtObservatory div.draw {
-   background: #cc852a;
+    background: #cc852a;
+}
+span.arrow.bcmtStation,
+span.arrow.bcmtObservatory {
+  color: #cc852a;
+  background: transparent;
+  font-weight:700;
+  border: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+}
+span.arrow.intermagnetStation,
+span.arrow.intermagnetObservatory {
+  color:#2880ca;
+  background: transparent;
+  font-weight:700;
+  border: none;
+  width: auto;
+  height: auto;
+  margin: 0;
 }
 .intermagnetStation div.draw path,
 .intermagnetObservatory div.draw path,
@@ -101,21 +142,25 @@ div.draw {
 .bcmtObservatory div.draw:hover {
    background: #f98a00;
 }
+.file .dates {
+    grid-column:2;
+    grid-row:2;
+}
 .file .center {
-    grid-column: 2;
+    grid-column: 3;
     grid-row: 2;
     padding-bottom:3px;
 } 
 .file .doi {
-    grid-column: 3;
-    grid-row: 2;
-}
-.file .sampling {
     grid-column: 4;
     grid-row: 2;
 }
-.file .license {
+.file .sampling {
     grid-column: 5;
+    grid-row: 2;
+}
+.file .license {
+    grid-column: 6;
     grid-row: 2;
 }    
 </style>
