@@ -3,7 +3,7 @@
     <div class="station-page" :class="data.group">
       <PopupComponent :group="data.group" :feature="data.feature" mode="page"></PopupComponent>
       <template v-if="data.files.length > 0">
-        <GraphComponent :file="data.files[0]" :group="data.group"></GraphComponent>
+        <GraphComponent :file="data.files[1]" :group="data.group"></GraphComponent>
       </template>
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>

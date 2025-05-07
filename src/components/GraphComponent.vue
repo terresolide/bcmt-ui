@@ -1,8 +1,15 @@
 <template>
-   <div  class="graph-container" :class="group">
-       <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
-       <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
-       <div id="Zcomp" @mousemove="highlight($event, 'Z')"></div>
+   <div  class="graph-container" >
+      <h3 :class="group">{{file.name}}
+        <span class="back" @click="close">
+          &times;
+        </span>
+      </h3>
+      <div>
+        <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
+        <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
+        <div id="Zcomp" @mousemove="highlight($event, 'Z')"></div>
+      </div>
     </div>
 </template>
 <script setup>
@@ -115,19 +122,13 @@ function draw (comp) {
             max = serieData[i]
         } 
     }
-    var title = null
-    if (comp === 'X') {
-      title = {text: file.name}
-    }
-   
-
     data.graphs[comp] = Highcharts.chart(comp + 'comp', {
         chart: {
           zooming:{type: 'x'},
           height: 200,
           marginLeft: 110
         },
-        title: title,
+        title: null,
         width: '680px',
         
         credits: {
@@ -227,11 +228,17 @@ onBeforeMount(() => {load()})
   top:0;
   left:0;
   z-index: 100;
+  max-width:900px;
+  width:900px;
   background: white;
   box-shadow: 0 3px 14px rgba(0,0,0,0.4);
   padding: 0 10px 10px 10px;
   border-radius: 10px 10px 0 0;
   max-height:100vh;
+  
+}
+.graph-container > div {
+  max-height:calc(100vh - 45px);
   overflow-y: auto;
 }
 </style>
