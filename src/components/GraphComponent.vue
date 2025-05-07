@@ -1,6 +1,5 @@
 <template>
-    le graphe
-   <div  class="grah-container" :class="group">
+   <div  class="graph-container" :class="group">
        <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
        <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
        <div id="Zcomp" @mousemove="highlight($event, 'Z')"></div>
@@ -81,30 +80,12 @@ function draw (comp) {
     var serie = []
     var min = null
     var max = null
-    for(var i=0; i < len; i++) {
-       serie.push([dates[i],serieData[i]])
-       plotlines.push({
-            color: '#ccd6eb',
-            value: dates[i],
-            width: 1,
-            id: i
-        })
-        if (min === null || min > serieData[i]) {
-             min = serieData[i]
-        } 
-        if (max === null || max < serieData[i]) {
-            max = serieData[i]
-        } 
-    }
-    var title = null
-    if (comp === 'X') {
-      title = {text: file.name}
-    }
-    // date format
-    var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
-    console.log(matches)
+     // date format
+     var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
     var formatDate = 'll'
+    var extension = 'min'
     if (matches[1]) {
+       extension = matches[1]
        switch (matches[1]) {
         case 'sec':
           formatDate = 'LTS'
@@ -116,12 +97,35 @@ function draw (comp) {
 
        }
     }
+    for(var i=0; i < len; i++) {
+      if (extension === 'sec' && i%10 != 0) {
+        continue
+      }
+       serie.push([dates[i],serieData[i]])
+      //  plotlines.push({
+      //       color: '#ccd6eb',
+      //       value: dates[i],
+      //       width: 1,
+      //       id: i
+      //   })
+        if (min === null || min > serieData[i]) {
+             min = serieData[i]
+        } 
+        if (max === null || max < serieData[i]) {
+            max = serieData[i]
+        } 
+    }
+    var title = null
+    if (comp === 'X') {
+      title = {text: file.name}
+    }
+   
 
     data.graphs[comp] = Highcharts.chart(comp + 'comp', {
         chart: {
           zooming:{type: 'x'},
           height: 200,
-          marginLeft: 120
+          marginLeft: 110
         },
         title: title,
         width: '680px',
@@ -169,6 +173,7 @@ function draw (comp) {
         xAxis: {
            type: 'datetime',
            lineColor:'#666',
+           zoomEnabled: true,
            events: {
 //              setExtremes (e) {
 //                _this.syncExtremes(e, type)
@@ -189,6 +194,11 @@ function draw (comp) {
          yAxis: {
              title: {
                  text: comp
+             },
+             labels: {
+              formatter: function () {
+                return this.value.toLocaleString()
+              }
              },
              min: min,
              max: max,
@@ -212,5 +222,16 @@ function draw (comp) {
 onBeforeMount(() => {load()})
 </script>
 <style>
-
+.graph-container {
+  position: fixed;
+  top:0;
+  left:0;
+  z-index: 100;
+  background: white;
+  box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+  padding: 0 10px 10px 10px;
+  border-radius: 10px 10px 0 0;
+  max-height:100vh;
+  overflow-y: auto;
+}
 </style>
