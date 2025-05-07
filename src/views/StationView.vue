@@ -118,7 +118,7 @@ window.addEventListener('resize', initSize)
 function initSize () {
   if (filesNode && filesNode.value) {
     var pos = filesNode.value.getBoundingClientRect()
-    filesNode.value.style.maxHeight = (window.innerHeight - pos.y - 30) + 'px'
+    filesNode.value.style.maxHeight = (window.innerHeight - pos.y + 30) + 'px'
   }
 }
 function initData () {

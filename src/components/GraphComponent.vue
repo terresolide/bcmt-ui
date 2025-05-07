@@ -6,6 +6,7 @@
         </span>
       </h3>
       <div v-if="data.error" style="color:darkred;">{{data.error }}</div>
+      <div v-if="data.loading" style="text-align:center"><span class="loader"></span></div>
       <div>
         <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
         <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
@@ -33,21 +34,32 @@ const data = reactive({
     series: null,
     error: null,
     graphs: {X:null, Y:null, Z:null},
-    pointDate: {date: null, X:null, Y:null, Z:null}
+    pointDate: {date: null, X:null, Y:null, Z:null},
+    loading: false
 })
 const graphcontainer = ref(null)
 
 function load () {
     data.error = null
+    comps.forEach(function (comp) {
+      if (data.graphs[comp]) {
+        data.graphs[comp].destroy()
+        data.graphs[comp] = null
+      }
+    })
+    data.loading = true
+
     let reader = new BcmtReader(file.properties.file)
     reader.read()
     .then((done) => {
         if (done) {
           data.series = reader.getSeries()
+          data.loading = false
           comps.forEach(function (comp) {draw(comp)})
         }
     }, (error) => {
       data.error = error
+      data.loading = false
     })
 }
 function highlight (e, comp) {
@@ -85,10 +97,7 @@ function highlight (e, comp) {
   
 }
 function draw (comp) {
-    if (data.graphs[comp]) {
-        data.graphs[comp].destroy()
-        data.graphs[comp] = null
-    }
+    
     var plotlines = []
     var dates = data.series.dates
     var serieData = data.series[comp]
@@ -284,10 +293,11 @@ watch(() => file,
 .graph-container {
   position: fixed;
   top:0;
-  left:0;
+  left:calc(50% - 450px);
   z-index: 100;
   max-width:900px;
   width:900px;
+  min-height:600px;
   background: white;
   box-shadow: 0 3px 14px rgba(0,0,0,0.4);
   padding: 0 10px 10px 10px;
