@@ -621,8 +621,7 @@ onBeforeMount(() => {
     transform: rotate(360deg);
   }
 } 
-</style>
-<style scoped>
+
 .header-file {
   display: grid;
  /* grid-template-columns: 130px minmax(150px,1fr) minmax(150px,1fr) 125px minmax(150px,1fr);*/
