@@ -81,6 +81,8 @@ import PopupComponent from '@/components/PopupComponent.vue';
 import { computed, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 const store = useStore()
 const server = store.state.api
 const route = useRoute()
@@ -272,11 +274,22 @@ function getObservedProperties () {
               }
             }
           })
-          console.log(data.frequencies)
           resolve(true)
         }
       })
   })
+}
+async function generateZip (files) {
+  console.log(files)
+  const zip = new JSZip()
+  for(const file of files) {
+    const f = await fetch(file.properties.file).then(r => r.blob())
+    zip.file(file.name, f)
+  }
+  zip.generateAsync({type:"blob"}).then(function(content) {
+    // see FileSaver.js
+    saveAs(content, "bcmt.zip");
+  });
 }
 function getFiles () {
     data.files = []

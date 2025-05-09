@@ -6,10 +6,7 @@ class BcmtReader {
         this.columns = []
         this.data = []
         this.series = {
-            dates: [],
-            X: [],
-            Y: [],
-            Z: []
+            dates: []
         }
         this.dates = []
         // this.file = 'https://catalog.formater/tam20250420vmin.min'
@@ -32,9 +29,14 @@ class BcmtReader {
             var pos= {
                 X: -1,
                 Y: -1,
-                Z: -1
+                Z: -1,
+                H: -1,
+                N: -1,
+                E: -1,
+                D: -1
             }
-            var coords =  ['X', 'Y', 'Z']
+            moment().utc()
+            var coords =  ['X', 'Y', 'Z', 'H', 'N', 'E', 'D']
             lines.forEach(function (line) {
                 if (line.startsWith('DATE ')) {
                     self.columns = line.split(/\s+/)
@@ -43,19 +45,32 @@ class BcmtReader {
 
                     coords.forEach(function (letter) {
                         var regex = new RegExp('^[A-Z]{3}' + letter + '$')
-                        pos[letter]= self.columns.findIndex((x) => regex.test(x))
+                        pos[letter]= self.columns.findIndex((x) => regex.test(x) && x !== 'DATE' && x !== 'TIME')
                     })
+                    for (var letter in pos) {
+                        if(pos[letter] === -1) {
+                            delete pos[letter]
+                        }
+                    }
                     begin = true
 
                 } else if (begin) {
                    var list = line.split(/\s+/)
+                  
                    self.series.dates.push(parseInt(moment.utc(list[posDate] + 'T' + list[posTime] + 'Z').format('x')))
-                   coords.forEach(function (letter) {
-                    if (pos[letter] < -1) {
-                        return Promise.reject('MISSING COLUMN ' + letter)
+                   if (Object.keys(pos).length < 3) {
+                        return Promise.reject('MISSING COLUMN ')
                     }
-                    self.series[letter].push(parseFloat(list[pos[letter]]))
-                   })
+                    for (var letter in pos) {
+                        if (!self.series[letter]) {
+                            self.series[letter]= []
+                        }
+                        if (parseFloat(list[pos[letter]]) >= 99999 ) {
+                            continue
+                        } 
+                        self.series[letter].push(parseFloat(list[pos[letter]]))
+                    }
+                   
                 }
             })
             return true

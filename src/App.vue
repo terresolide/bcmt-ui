@@ -37,6 +37,7 @@ onBeforeUnmount(() => {
 }
 </style>
 <style scoped>
+
 .page {
     position:absolute;
     top:0;

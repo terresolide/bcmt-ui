@@ -10,6 +10,10 @@
       <div>
         <div id="Xcomp" @mousemove="highlight($event, 'X')"></div>
         <div id="Ycomp" @mousemove="highlight($event, 'Y')"></div>
+        <div id="Hcomp" @mousemove="highlight($event, 'H')"></div>
+        <div id="Dcomp" @mousemove="highlight($event, 'D')"></div>
+        <div id="Ncomp" @mousemove="highlight($event, 'N')"></div>
+        <div id="Ecomp" @mousemove="highlight($event, 'E')"></div>
         <div id="Zcomp" @mousemove="highlight($event, 'Z')"></div>
       </div>
     </div>
@@ -21,8 +25,9 @@ import moment from 'moment'
 import { onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue'
 
 const {file, group} = defineProps({file: Object, group: String})
-const comps = ["X", "Y", "Z"]
-const colors = {X: "#2caffe", Y: "#544fc5", Y: "#00e272", Z: "#fe6a35"}
+const comps = ["X", "Y","H", "D", "N" , "E", "Z"]
+const colors = {X: "#2caffe", Y: "#544fc5", H: "#2caffe", D: "#00e272",N: "#2caffe", E: "#00e272", Y: "#00e272", Z: "#fe6a35"}
+moment().utc()
 const data = reactive({
     top: 5,
     left: 20,
@@ -33,8 +38,8 @@ const data = reactive({
     mouseupListener: null,
     series: null,
     error: null,
-    graphs: {X:null, Y:null, Z:null},
-    pointDate: {date: null, X:null, Y:null, Z:null},
+    graphs: {X:null, Y:null, H:null, D: null, N: null, E:null, Z:null},
+    pointDate: {date: null, X:null, Y:null, H:null, D: null, N: null, E:null, Z:null},
     loading: false
 })
 const graphcontainer = ref(null)
@@ -55,7 +60,10 @@ function load () {
         if (done) {
           data.series = reader.getSeries()
           data.loading = false
-          comps.forEach(function (comp) {draw(comp)})
+          comps.forEach(function (comp) {
+            if (data.series[comp]) {
+              draw(comp)}
+          })
         }
     }, (error) => {
       data.error = error
@@ -79,6 +87,9 @@ function highlight (e, comp) {
   data.pointDate[comp] = point.open || point.y
 
   for (var key in data.graphs) {
+    if (!data.graphs[key]) {
+      continue
+    }
     var chart = data.graphs[key];
     if (chart && typeof chart !== 'undefined') {
       var pt = chart.series[0].points.find(el => el.x === point.x )
@@ -211,7 +222,10 @@ function draw (comp) {
          },
          yAxis: {
              title: {
-                 text: comp
+                 text: '<span style="font-weight:700">' + comp + '</span>',
+                 rotation: 0,
+                 margin:20,
+                 useHTML: true
              },
              labels: {
               formatter: function () {
