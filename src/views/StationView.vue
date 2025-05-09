@@ -285,6 +285,7 @@ async function generateZip (files) {
   for(const file of files) {
     const f = await fetch(file.properties.file).then(r => r.blob())
     zip.file(file.name, f)
+    // zip.remove(file.name)
   }
   zip.generateAsync({type:"blob"}).then(function(content) {
     // see FileSaver.js
