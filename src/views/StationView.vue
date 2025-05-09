@@ -108,7 +108,8 @@ const data= reactive({
     nb: 30
   },
   lastIndex: [0],
-  selectedFile: null
+  selectedFile: null,
+  resizeListener: null
 })
 const filesNode = ref(null)
 const loading = ref(false)
@@ -118,7 +119,7 @@ window.addEventListener('resize', initSize)
 function initSize () {
   if (filesNode && filesNode.value) {
     var pos = filesNode.value.getBoundingClientRect()
-    filesNode.value.style.maxHeight = (window.innerHeight - pos.y + 30) + 'px'
+    filesNode.value.style.maxHeight = (window.innerHeight - pos.y + (loading.value ? 30 : -30)) + 'px'
   }
 }
 function initData () {
@@ -525,6 +526,7 @@ function paramsChange (param) {
   changeRoute(query)
 }
 onBeforeMount(() => {
+  window.addEventListener('resize', initSize)
    var query = route.query
    if (query.nb) {
     data.paging.nb = parseInt(query.nb)
@@ -625,7 +627,7 @@ onBeforeMount(() => {
   display: grid;
  /* grid-template-columns: 130px minmax(150px,1fr) minmax(150px,1fr) 125px minmax(150px,1fr);*/
   grid-template-columns: 130px  minmax(170px,1fr)  90px minmax(170px,1fr) 90px 110px;
-  grid-gap: px;
+  grid-gap: 5px;
   line-height:1;
   grid-template-rows: auto; 
   padding: 5px;

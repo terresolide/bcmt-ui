@@ -33,6 +33,7 @@ onBeforeUnmount(() => {
 <style>
 #app {
     position:relative;
+    font-family: Arial, Helvetica, sans-serif;
 }
 </style>
 <style scoped>
