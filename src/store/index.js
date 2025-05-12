@@ -1,4 +1,5 @@
 import {createStore} from 'vuex'
+import basket from './basket.js'
 // import user from './modules/user'
 // import activation from './modules/activation'
 export default function makeStore(config) {
@@ -16,8 +17,7 @@ export default function makeStore(config) {
         actions: {
         },
         modules: {
-            // user,
-            // activation
+            basket
         }
     })
 }

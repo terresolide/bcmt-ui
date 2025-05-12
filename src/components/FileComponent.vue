@@ -1,11 +1,15 @@
 <template>
    <div  class="file" :class="group">
-      <div class="download"><a @click="download()" style="cursor:pointer;" :class="{visited: visited}">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 384 512"><path d="M0 64C0 28.7 28.7 0 64 0L224 0l0 128c0 17.7 14.3 32 32 32l128 0 0 288c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 64zm384 64l-128 0L256 0 384 128z"/></svg>
-      </a>
+      <div class="download"><a @click="download()" title="Download" style="cursor:pointer;" :class="{visited: visited}">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 384 512">
+         <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM216 232l0 102.1 31-31c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-72 72c-9.4 9.4-24.6 9.4-33.9 0l-72-72c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l31 31L168 232c0-13.3 10.7-24 24-24s24 10.7 24 24z"/></svg>   </a>
+       <a title="add to zip" style="margin-left:10px;" @click="toggleFile">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" viewBox="0 0 384 512">
+            <path d="M64 0C28.7 0 0 28.7 0 64L0 448c0 35.3 28.7 64 64 64l256 0c35.3 0 64-28.7 64-64l0-288-128 0c-17.7 0-32-14.3-32-32L224 0 64 0zM256 0l0 128 128 0L256 0zM96 48c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16zm0 64c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16zm-6.3 71.8c3.7-14 16.4-23.8 30.9-23.8l14.8 0c14.5 0 27.2 9.7 30.9 23.8l23.5 88.2c1.4 5.4 2.1 10.9 2.1 16.4c0 35.2-28.8 63.7-64 63.7s-64-28.5-64-63.7c0-5.5 .7-11.1 2.1-16.4l23.5-88.2zM112 336c-8.8 0-16 7.2-16 16s7.2 16 16 16l32 0c8.8 0 16-7.2 16-16s-7.2-16-16-16l-32 0z"/></svg>
+            +
+        </a>
        <div class="draw" title="Draw" @click="$emit('draw')"><svg data-name="Layer 1" width="12" height="12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="m.64 11.85-.66-.75 2.57-2.25 2.02 1.55 4.68-5.15 3.72 3.59 2.4-2.05.65.75-3.08 2.66-3.65-3.52-4.6 5.08-2.1-1.62-1.95 1.71z"/></svg>
        </div>
-       Add to ZIp<input type="checkbox" /> 
       </div>
       <div class="title">{{ file.name }}</div>
       <div class="dates">{{ start }}
@@ -31,6 +35,7 @@
 import moment from 'moment'
 import { computed, ref} from 'vue'
 const {file} = defineProps({file: Object, group: String})
+import { useStore } from 'vuex';
 import {saveAs} from 'file-saver'
 const extension = computed(() => {
     var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
@@ -39,17 +44,31 @@ const extension = computed(() => {
     }
     return ''
 })
+const store = useStore()
 const start = computed(() => {
     return moment(file.properties.start).format('ll')
 })
 const end = computed(() => {
     return moment(file.properties.end).format('ll')
 })
+
+const inBasket = computed(() => {
+    return store.getters['basket/in'](file.name)
+})
 const visited = ref(false)
+
 async function download() {
     const f = await fetch(file.properties.file).then(res => res.blob())
     saveAs(f, file.name)
     visited.value = true
+}
+function toggleFile() {
+    if (inBasket) {
+        console.log('remove')
+        store.commit('basket/remove', file.name)
+    } else {
+        store.commit('basket/add', file)
+    }
 }
 </script>
 <style>
@@ -90,6 +109,11 @@ div.draw {
     border-radius:1px;
     cursor: pointer;
 }  
+.bcmtStation a,
+.bcmtObservatory a {
+    color:#cc852a;
+    cursor: pointer;
+}
 .bcmtStation a path,
 .bcmtObservatory a path {
    fill: #cc852a;
@@ -97,6 +121,15 @@ div.draw {
 .bcmtStation a:hover path,
 .bcmtObservatory a:hover path {
    fill: #f98a00;
+}
+.bcmtStation a:hover,
+.bcmtObservatory a:hover {
+   color: #f98a00;
+}
+.intermagnetStation a,
+.intermagnetObservatory a {
+   color: #2880ca;
+   cursor: pointer;
 }
 .intermagnetStation a path,
 .intermagnetObservatory a path {
@@ -137,7 +170,10 @@ span.arrow.intermagnetObservatory {
     fill:#ffffff;
     stroke: #ffffff;
 }
-    
+.intermagnetStation a:hover,
+.intermagnetObservatory a:hover {
+    color: #2067a1;
+}  
 .intermagnetStation a:hover path,
 .intermagnetObservatory a:hover path {
     fill: #2067a1;

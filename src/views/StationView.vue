@@ -5,6 +5,7 @@
       <template v-if="data.selectedFile">
         <GraphComponent :file="data.selectedFile" :group="data.group" @close="data.selectedFile=null"></GraphComponent>
       </template>
+      {{basket}}
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
        
@@ -117,6 +118,9 @@ const filesNode = ref(null)
 const loading = ref(false)
 const from = computed(() => {return data.paging.offset + 1})
 const to = computed(() => {return data.paging.offset + data.files.length})
+const basket = computed(() => {
+    return store.getters['basket/files']
+})
 window.addEventListener('resize', initSize)
 function initSize () {
   if (filesNode && filesNode.value) {
