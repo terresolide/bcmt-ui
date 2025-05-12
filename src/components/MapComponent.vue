@@ -333,7 +333,15 @@
       display:inline-block;
       vertical-align:middle;
       line-height:1;
-  }     
+  }   
+ .lfh-control-basket a {
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+ } 
+ .lfh-control-basket a path {
+  fill: #333;
+ }  
   div.icon-orange span,
   div.icon-blue span {
   color: white;
