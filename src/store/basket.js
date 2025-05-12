@@ -18,12 +18,13 @@ const getters = {
         if (!state.zip) {
             return false
         }
+        var into = false
         state.zip.forEach(function (path) {
             if (path === filename) {
-                return true
+                into = true
             }
         })
-        return false
+        return into
     }
 
 }
@@ -35,7 +36,7 @@ const mutations = {
         const f = await fetch(file.properties.file).then(r => r.blob())
         state.zip.file(file.name, f)
     },
-    remove (filename) {
+    remove (state, filename) {
         if (state.zip) {
             state.zip.remove(filename)
         }
