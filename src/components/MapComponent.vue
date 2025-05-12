@@ -6,6 +6,9 @@
   <div ref="popup" v-show="data.selected.feature">
   <PopupComponent :group="data.selected.group" :feature="data.selected.feature" mode="popup"></PopupComponent>
   </div>
+  <div ref="basket">
+  <BasketComponent></BasketComponent>
+  </div>
   </template>
   <script setup>
   import L from 'leaflet'
@@ -19,11 +22,13 @@
   import '@/leaflet/leaflet.control.mylayers.js'
   import '@/leaflet/leaflet.control.logo.js'
   import '@/leaflet/leaflet.control.basket.js'
+  import BasketComponent from './BasketComponent.vue'
   import {reactive, ref, onMounted, watch} from 'vue'
   import { useStore } from 'vuex'
   import {useRoute, useRouter} from 'vue-router'
   const map = ref(null)
   const popup = ref(null)
+  const basket = ref(null)
   const store = useStore()
   const server = store.state.api
   const props = defineProps({
@@ -138,7 +143,7 @@
       }
       var container = map.value
       data.map = L.map( container).setView([35, 0], 3);
-      data.basketLayer = new L.Control.Basket();
+      data.basketLayer = new L.Control.Basket(basket.value);
       data.controlLayer = new L.Control.MyLayers(null, null,{position: 'topright'})
       data.basketLayer.addTo(data.map)
       data.controlLayer.tiles.arcgisTopo.layer.addTo(data.map)    
@@ -342,6 +347,19 @@
  .lfh-control-basket a path {
   fill: #333;
  }  
+ .lfh-control-basket {
+  background: white;
+ }
+ .lfh-control-basket div.leaflet-basket-list {
+  display:none;
+ }
+ .lfh-control-basket:hover > a {
+    display:none;
+ }
+ .lfh-control-basket:hover div.leaflet-basket-list {
+  min-height:50px;
+  display:block;
+ }
   div.icon-orange span,
   div.icon-blue span {
   color: white;
