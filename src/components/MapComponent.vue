@@ -18,6 +18,7 @@
   import PopupComponent from './PopupComponent.vue'
   import '@/leaflet/leaflet.control.mylayers.js'
   import '@/leaflet/leaflet.control.logo.js'
+  import '@/leaflet/leaflet.control.basket.js'
   import {reactive, ref, onMounted, watch} from 'vue'
   import { useStore } from 'vuex'
   import {useRoute, useRouter} from 'vue-router'
@@ -137,7 +138,9 @@
       }
       var container = map.value
       data.map = L.map( container).setView([35, 0], 3);
+      data.basketLayer = new L.Control.Basket();
       data.controlLayer = new L.Control.MyLayers(null, null,{position: 'topright'})
+      data.basketLayer.addTo(data.map)
       data.controlLayer.tiles.arcgisTopo.layer.addTo(data.map)    
       data.controlLayer.addTo(data.map)
       L.control.scale().addTo(data.map)
