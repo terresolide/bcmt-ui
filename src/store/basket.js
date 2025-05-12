@@ -1,5 +1,5 @@
 import JSZip from 'jszip'
-
+import { saveAs } from 'file-saver'
 const state = () => {
     zip: null
 }
@@ -40,6 +40,15 @@ const mutations = {
         if (state.zip) {
             state.zip.remove(filename)
         }
+    },
+    download (state) {
+        state.zip.generateAsync({type:"blob"}).then(function(content) {
+            // see FileSaver.js
+            saveAs(content, "bcmt.zip");
+        });
+        state.zip.forEach(function (path) {
+            state.zip.remove(path)
+        })
     }
 
 }

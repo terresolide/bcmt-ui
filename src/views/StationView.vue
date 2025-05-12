@@ -1,6 +1,6 @@
 <template>
   <div style="background: rgba(0,0,0,0.2);margin:0;padding:10px;">
-       <div class="leaflet-top leaflet-right">
+       <div class="leaflet-touch leaflet-top leaflet-right">
         <div class="leaflet-bar leaflet-control lfh-control-basket">
           <a class="icon-palette" title="Basket">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" viewBox="0 0 576 512">
@@ -8,13 +8,7 @@
             </svg>
           </a>
           <div class="leaflet-basket-list">
-              <div>
-                <h3>Basket</h3>
-                <ul>
-                  <li>kou20250419vmin.min</li>
-                  <li>kou20250419vsec.sec</li>
-                </ul>
-              </div>
+             <BasketComponent></BasketComponent>
           </div>
         </div>
       </div>
@@ -24,7 +18,6 @@
       <template v-if="data.selectedFile">
         <GraphComponent :file="data.selectedFile" :group="data.group" @close="data.selectedFile=null"></GraphComponent>
       </template>
-      {{basket}}
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
        
@@ -98,11 +91,10 @@
 import FileComponent from '@/components/FileComponent.vue';
 import GraphComponent from '@/components/GraphComponent.vue';
 import PopupComponent from '@/components/PopupComponent.vue';
+import BasketComponent from '@/components/BasketComponent.vue';
 import { computed, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
-import JSZip from 'jszip'
-import { saveAs } from 'file-saver'
 const store = useStore()
 const server = store.state.api
 const route = useRoute()
@@ -302,19 +294,7 @@ function getObservedProperties () {
       })
   })
 }
-async function generateZip (files) {
-  console.log(files)
-  const zip = new JSZip()
-  for(const file of files) {
-    const f = await fetch(file.properties.file).then(r => r.blob())
-    zip.file(file.name, f)
-    // zip.remove(file.name)
-  }
-  zip.generateAsync({type:"blob"}).then(function(content) {
-    // see FileSaver.js
-    saveAs(content, "bcmt.zip");
-  });
-}
+
 function getFiles () {
     data.files = []
     // ?$filter=Sensor/@iot.id eq 2 and ObservedProperty/@iot.id eq 5
