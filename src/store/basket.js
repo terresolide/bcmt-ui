@@ -36,7 +36,9 @@ const getters = {
 
 }
 const mutations = {
-    add (state, file) {
+    add (state, obj) {
+         state.zip.file(obj.name, obj.f)
+        return
         return new Promise((resolve, reject) => {
             if (!state.zip) {
             state.zip = new JSZip() 
@@ -80,6 +82,28 @@ const mutations = {
 
 }
 const actions = {
+    add ({ state, commit, rootState }, file) {
+        return new Promise((resolve, reject) => {
+            if (!state.zip) {
+            state.zip = new JSZip() 
+            }
+            if (Object.keys(state.zip.files).length >= state.limit) {
+                if (reject) {
+                    reject(file.name)
+                }
+                return
+            }
+            fetch(file.properties.file).then(r => r.blob())
+            .then((f) => {
+                commit('add', {name: file.name, file: f} )
+               
+                if (resolve) {
+                    resolve(file.name)
+                }
+                return true
+            })
+        })
+    }
 
 }
 export default {

@@ -65,7 +65,7 @@ function toggleFile() {
         console.log('remove')
         store.commit('basket/remove', file.name)
     } else {
-        store.commit('basket/add', file).then((res) => {console.log(res)})
+        store.dispatch('basket/add', file).then((res) => {console.log(res)})
     }
 }
 </script>

@@ -170,7 +170,7 @@ function addListToBasket () {
   for (var i=0; i < data.files.length && count < basketLimit.value; i++) {
     console.log(i)
     if (!store.getters['basket/in'](data.files[i].name)) {
-        list.push(store.commit('basket/add', data.files[i]))
+        list.push(store.dispatch('basket/add', data.files[i]).then(res => {return res}))
         count++
     }
   }
