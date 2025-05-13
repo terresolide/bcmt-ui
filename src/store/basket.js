@@ -1,8 +1,11 @@
-import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
+import JSZip from 'jszip'
 import moment from 'moment'
 const state = () => {
-    zip: null
+    return {
+        zip: null,
+        limit: 100
+    }
 }
 const getters = {
     files (state, getters) {
@@ -26,6 +29,16 @@ const getters = {
             }
         })
         return into
+    },
+    limit (state, getters) {
+        return state.limit
+    },
+    size (state, getters) {
+        if (!state.zip) {
+            return 0
+        }
+        console.log(state.zip.files)
+        return Object.keys(state.zip.files).length
     }
 
 }
@@ -34,8 +47,12 @@ const mutations = {
         if (!state.zip) {
            state.zip = new JSZip() 
         }
+        if (Object.keys(state.zip.files).length >= state.limit) {
+            return
+        }
         const f = await fetch(file.properties.file).then(r => r.blob())
         state.zip.file(file.name, f)
+
     },
     remove (state, filename) {
         if (state.zip) {

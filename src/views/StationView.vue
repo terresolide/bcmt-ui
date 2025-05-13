@@ -50,10 +50,20 @@
         </div>
        
       </div>
+      <div class="to-basket">
+        <button class="bcmt-button" @click="addToBasket()">Add all in Basket ({{basketSize}}&le;{{basketLimit}})</button></div>
       <div class="paging">
         <span class="bcmt-button" :class="{disabled: data.paging.offset=== 0}" @click="first">&laquo;</span>
         <span class="bcmt-button" :class="{disabled: data.paging.offset=== 0}" @click="previous">&lsaquo;</span>
-       Results: <b>{{ from }}</b> to <b>{{ to }}</b> among {{ data.total }}
+       Results:
+       <template v-if="data.available"><b>{{ data.files.length }}</b> available from
+         <template v-if="data.lastIndex.length > 1">
+            <b>{{ data.lastIndex[data.lastIndex.length - 2] + 1 }}</b> to <b>{{ data.lastIndex[data.lastIndex.length - 1]}}</b> among {{ data.total }}
+         </template>
+       </template>
+       <template v-else>
+       <b>{{ from }}</b> to <b>{{ to }}</b> 
+       </template>
         &nbsp; (<select v-model="data.paging.nb" @change="pagingChange">
 
           <option value="30">30 per page</option>
@@ -82,16 +92,16 @@
     <template v-else><div style="text-align:center;margin: 20px;"><em>No file found</em></div></template>
       <div ref="filesNode" style="overflow-y:scroll;" >
       
-      <FileComponent v-for="file in data.files" :file="file" :group="data.group" @draw="data.selectedFile = file"></FileComponent>
+      <FileComponent v-for="file in data.files" :file="file" :group="data.group" :selected="data.selectedFile" @draw="data.selectedFile = file"></FileComponent>
       </div>
     </div>
   </div>
 </template>
 <script setup>
+import BasketComponent from '@/components/BasketComponent.vue';
 import FileComponent from '@/components/FileComponent.vue';
 import GraphComponent from '@/components/GraphComponent.vue';
 import PopupComponent from '@/components/PopupComponent.vue';
-import BasketComponent from '@/components/BasketComponent.vue';
 import { computed, onBeforeMount, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -129,8 +139,11 @@ const filesNode = ref(null)
 const loading = ref(false)
 const from = computed(() => {return data.paging.offset + 1})
 const to = computed(() => {return data.paging.offset + data.files.length})
-const basket = computed(() => {
-    return store.getters['basket/files']
+const basketSize = computed(() => {
+    return store.getters['basket/size']
+})
+const basketLimit = computed(() => {
+    return store.getters['basket/limit']
 })
 window.addEventListener('resize', initSize)
 function initSize () {
@@ -148,6 +161,19 @@ function initData () {
   data.sensors = []
   data.observedProperties = []
   data.samplings = []
+}
+function addToBasket () {
+  data.files.forEach(function (file) {
+    setTimeout(function (){ addFileToBasket(file)}, 0)
+  })
+}
+function addFileToBasket (file) {
+  if (store.getters['basket/size'] < store.getters['basket/limit']) {
+      store.commit('basket/add', file)
+    } else {
+      console.log('full')
+    }
+
 }
 function getStation () {
   // init params
@@ -670,11 +696,18 @@ label {
     font-weight:700;
     color: #333;
 }
+.to-basket {
+  display:inline-block;
+  width: 130px;
+  max-width: 100px;
+}
 .paging {
+  display: inline-block;
+  width:calc(100% - 130px);
   text-align:center;
   padding-bottom:3px;
-  border-bottom: 1px dotted grey;
 }
+button.bcmt-button,
 span.bcmt-button {
   font-size: 1.2em;
   cursor: pointer;
@@ -688,6 +721,14 @@ span.bcmt-button {
   vertical-align: middle;
   opacity: 0.9;
 }
+button.bcmt-button {
+  font-size:.9em;
+  border-radius:3px;
+  border:none;
+  margin-bottom:2px;
+}
+.intermagnetObservatory button.bcmt-button,
+.intermagnetStation button.bcmt-button,
 .intermagnetObservatory span.bcmt-button,
 .intermagnetStation span.bcmt-button {
   background:#2880ca;

@@ -16,8 +16,8 @@
     </div>
 </template>
 <script setup>
-import {computed} from 'vue'
-import {useStore} from 'vuex'
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 const store = useStore()
 const files = computed(() => {
     return store.getters['basket/files']
@@ -32,13 +32,19 @@ function remove (filename) {
 <style scoped>
 .basket-container {
     padding: 5px 10px;
+    margin-bottom:20px;
 }
 ul {
     padding-left: 20px;
     list-style:none;
+    max-height:calc(80vh - 80px);
+    overflow-y:auto;
+
+   
 }
 li.basket-file {
     line-height:1.4;
+    margin-right: 10px;
 }
 li.basket-file > span:first-child {
     display:inline-block;
