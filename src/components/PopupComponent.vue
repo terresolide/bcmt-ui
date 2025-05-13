@@ -52,7 +52,7 @@
               <li v-for="item in contacts" v-html="item"></li>
             </ul>
           </template>
-          <div v-if="mode === 'popup'"><RouterLink :to="{name: 'station', params: {id: feature.id }}" >See data</RouterLink></div>
+          <div v-if="mode === 'popup'"><RouterLink :to="{name: 'station', params: {id: feature.id }, query: {available: true, frequency: 'min'}}" >See data</RouterLink></div>
         </div>
       </div>   
   </div>

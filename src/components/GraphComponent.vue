@@ -193,8 +193,8 @@ function draw (comp) {
                  chart.tooltip.hide();
                }
             }
-            data.pointDate.date = moment.unix(this.point.x/ 1000).format(formatDate)
-            var s = '<b>' + moment.unix(this.point.x/ 1000).format(formatDate) + '</b><br />'
+            data.pointDate.date = moment.unix(this.point.x/ 1000).utc().format(formatDate)
+            var s = '<b>' + moment.unix(this.point.x/ 1000).utc().format(formatDate) + '</b><br />'
             return s + values.join('<br />')
           },
           shared: false
