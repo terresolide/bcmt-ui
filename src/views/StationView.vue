@@ -58,11 +58,11 @@
        Results:
        <template v-if="data.available"><b>{{ data.files.length }}</b> best available from
          <template v-if="data.lastIndex.length > 1">
-            <b>{{ data.lastIndex[data.lastIndex.length - 2] + 1 }}</b> to <b>{{ data.lastIndex[data.lastIndex.length - 1]}}</b> among {{ data.total }}
+            <b>{{ data.lastIndex[data.lastIndex.length - 2] + 1 }}</b> to <b>{{ data.lastIndex[data.lastIndex.length - 1]}}</b> among {{ data.total.toLocaleString() }}
          </template>
        </template>
        <template v-else>
-       <b>{{ from }}</b> to <b>{{ to }}</b> 
+       <b>{{ from }}</b> to <b>{{ to }}</b> among {{ data.total.toLocaleString() }}
        </template>
         &nbsp; (<select v-model="data.paging.nb" @change="pagingChange">
 
@@ -738,6 +738,7 @@ button.bcmt-button {
 .intermagnetStation span.bcmt-button {
   background:#2880ca;
 }
+button.bcmt-button:hover,
 span.bcmt-button:hover {
   opacity:1;
 }

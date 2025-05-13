@@ -1,7 +1,7 @@
 <template>
     <div class="basket-container">
         <h3>Your basket
-            <template v-if="files.length > 0">({{ files.length }} files)</template>
+            <template v-if="files.length > 0">( {{ files.length }} / {{ basketLimit }} files )</template>
         </h3>
         <template v-if="files.length === 0">
             Your basket is empty!
@@ -28,6 +28,7 @@ const store = useStore()
 const files = computed(() => {
     return store.getters['basket/files']
 })
+const basketLimit = store.getters['basket/limit']
 function download () {
     store.commit('basket/download')
 }
