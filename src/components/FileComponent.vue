@@ -31,11 +31,11 @@
     </div>
 </template>
 <script setup>
-import moment from 'moment'
-import { computed, ref} from 'vue'
-const {file} = defineProps({file: Object, group: String})
+import { saveAs } from 'file-saver';
+import moment from 'moment';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
-import {saveAs} from 'file-saver'
+const {file} = defineProps({file: Object, group: String})
 const extension = computed(() => {
     var matches = /[^\.]*\.([^.]*)$/.exec(file.name)
     if (matches.length > 1) {
@@ -65,7 +65,7 @@ function toggleFile() {
         console.log('remove')
         store.commit('basket/remove', file.name)
     } else {
-        store.commit('basket/add', file)
+        store.commit('basket/add', file).then((res) => {console.log(res)})
     }
 }
 </script>

@@ -1,6 +1,8 @@
 <template>
     <div class="basket-container">
-        <h3>Your basket</h3>
+        <h3>Your basket
+            <template v-if="files.length > 0">({{ files.length }} files)</template>
+        </h3>
         <template v-if="files.length === 0">
             Your basket is empty!
         </template>
@@ -52,6 +54,9 @@ li.basket-file > span:first-child {
 }
 li.basket-file {
     border-bottom: 1px solid lightgrey;
+}
+li.basket-file:nth-child(2n) {
+  background: #e6ebf0;
 }
 .close {
     border: 1px dotted white;

@@ -51,12 +51,12 @@
        
       </div>
       <div class="to-basket">
-        <button class="bcmt-button" @click="addToBasket()">Add all in Basket ({{basketSize}}&le;{{basketLimit}})</button></div>
+        <button class="bcmt-button" :class="{disabled: basketSize >= basketLimit}" @click="addListToBasket()">Add list to Basket (in:{{basketSize}} &le; max:{{basketLimit}})</button></div>
       <div class="paging">
         <span class="bcmt-button" :class="{disabled: data.paging.offset=== 0}" @click="first">&laquo;</span>
         <span class="bcmt-button" :class="{disabled: data.paging.offset=== 0}" @click="previous">&lsaquo;</span>
        Results:
-       <template v-if="data.available"><b>{{ data.files.length }}</b> available from
+       <template v-if="data.available"><b>{{ data.files.length }}</b> best available from
          <template v-if="data.lastIndex.length > 1">
             <b>{{ data.lastIndex[data.lastIndex.length - 2] + 1 }}</b> to <b>{{ data.lastIndex[data.lastIndex.length - 1]}}</b> among {{ data.total }}
          </template>
@@ -133,7 +133,8 @@ const data= reactive({
   },
   lastIndex: [0],
   selectedFile: null,
-  resizeListener: null
+  resizeListener: null,
+  adding: false
 })
 const filesNode = ref(null)
 const loading = ref(false)
@@ -162,19 +163,20 @@ function initData () {
   data.observedProperties = []
   data.samplings = []
 }
-function addToBasket () {
-  data.files.forEach(function (file) {
-    setTimeout(function (){ addFileToBasket(file)}, 0)
-  })
-}
-function addFileToBasket (file) {
-  if (store.getters['basket/size'] < store.getters['basket/limit']) {
-      store.commit('basket/add', file)
-    } else {
-      console.log('full')
-    }
+function addListToBasket () {
+  var count = basketSize.value
+  var list = []
 
+  for (var i=0; i < data.files.length && count < basketLimit.value; i++) {
+    console.log(i)
+    if (!store.getters['basket/in'](data.files[i].name)) {
+        list.push(store.commit('basket/add', data.files[i]))
+        count++
+    }
+  }
+  return Promise.all(list).then((values) => {console.log(values)})
 }
+
 function getStation () {
   // init params
   
@@ -699,7 +701,7 @@ label {
 .to-basket {
   display:inline-block;
   width: 130px;
-  max-width: 100px;
+  max-width: 130px;
 }
 .paging {
   display: inline-block;
@@ -736,6 +738,7 @@ button.bcmt-button {
 span.bcmt-button:hover {
   opacity:1;
 }
+button.bcmt-button.disabled,
 span.bcmt-button.disabled {
   opacity: 0.3;
   cursor: not-allowed;

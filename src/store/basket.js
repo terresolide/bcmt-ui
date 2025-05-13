@@ -4,7 +4,7 @@ import moment from 'moment'
 const state = () => {
     return {
         zip: null,
-        limit: 100
+        limit: 30
     }
 }
 const getters = {
@@ -12,23 +12,17 @@ const getters = {
         if (!state.zip) {
             return []
         }
-        var list = []
-        state.zip.forEach(function (path) {
-            list.push(path)
-        })
-        return list
+        return Object.keys(state.zip.files) 
     },
     in: (state, getters) => (filename) => {
+        console.log(filename)
         if (!state.zip) {
             return false
         }
-        var into = false
-        state.zip.forEach(function (path) {
-            if (path === filename) {
-                into = true
-            }
-        })
-        return into
+        if (state.zip.files[filename]) {
+            return true
+        }
+        return false
     },
     limit (state, getters) {
         return state.limit
@@ -37,22 +31,36 @@ const getters = {
         if (!state.zip) {
             return 0
         }
-        console.log(state.zip.files)
         return Object.keys(state.zip.files).length
     }
 
 }
 const mutations = {
-    async add (state, file) {
-        if (!state.zip) {
-           state.zip = new JSZip() 
-        }
-        if (Object.keys(state.zip.files).length >= state.limit) {
-            return
-        }
-        const f = await fetch(file.properties.file).then(r => r.blob())
-        state.zip.file(file.name, f)
-
+    add (state, file) {
+        return new Promise((resolve, reject) => {
+            if (!state.zip) {
+            state.zip = new JSZip() 
+            }
+            if (Object.keys(state.zip.files).length >= state.limit) {
+                if (reject) {
+                    reject(file.name)
+                }
+                return
+            }
+            fetch(file.properties.file).then(r => r.blob())
+            .then((f) => {
+                state.zip.file(file.name, f)
+                if (resolve) {
+                    resolve(file.name)
+                }
+                return true
+            })
+        })
+    },
+    clear (state) {
+        state.zip.forEach(function (path) {
+            state.zip.remove(path)
+        })
     },
     remove (state, filename) {
         if (state.zip) {
