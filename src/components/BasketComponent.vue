@@ -7,13 +7,17 @@
             Your basket is empty!
         </template>
         <template v-else>
+            <div style="text-align:right;">
+                <button @click="clean">Empty</button>  
+                <button @click="download">Download</button>
+            </div>
             <ul>
                 <li v-for="file in files" class="basket-file">
                     <span>{{file}}</span>
                     <span @click="remove(file)" class="close" title="Remove">&times;</span>
                 </li>
             </ul>
-            <button @click="download">Download</button>
+            
         </template>
     </div>
 </template>
@@ -26,6 +30,9 @@ const files = computed(() => {
 })
 function download () {
     store.commit('basket/download')
+}
+function clean () {
+    store.commit('basket/clean')
 }
 function remove (filename) {
     store.commit('basket/remove', filename)
@@ -43,6 +50,9 @@ ul {
     overflow-y:auto;
 
    
+}
+.basket-container button {
+    margin-left:5px;
 }
 li.basket-file {
     line-height:1.4;

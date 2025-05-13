@@ -92,7 +92,7 @@
     <template v-else><div style="text-align:center;margin: 20px;"><em>No file found</em></div></template>
       <div ref="filesNode" style="overflow-y:scroll;" >
       
-      <FileComponent v-for="file in data.files" :file="file" :group="data.group" :selected="data.selectedFile" @draw="data.selectedFile = file"></FileComponent>
+      <FileComponent v-for="file in data.files" :file="file" :group="data.group" :selected="data.selectedFile" :disabled="data.adding || basketSize >= basketLimit" @draw="data.selectedFile = file"></FileComponent>
       </div>
     </div>
   </div>
@@ -166,7 +166,7 @@ function initData () {
 function addListToBasket () {
   var count = basketSize.value
   var list = []
-
+  data.adding = true
   for (var i=0; i < data.files.length && count < basketLimit.value; i++) {
     console.log(i)
     if (!store.getters['basket/in'](data.files[i].name)) {
@@ -174,7 +174,10 @@ function addListToBasket () {
         count++
     }
   }
-  return Promise.all(list).then((values) => {console.log(values)})
+  return Promise.all(list).then((values) => {
+    data.adding = false
+    console.log(values)
+  })
 }
 
 function getStation () {

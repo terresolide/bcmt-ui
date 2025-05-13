@@ -4,7 +4,9 @@ import moment from 'moment'
 const state = () => {
     return {
         zip: null,
-        limit: 30
+        limit: 30,
+        progress: null,
+        generating: false
     }
 }
 const getters = {
@@ -36,30 +38,30 @@ const getters = {
 
 }
 const mutations = {
-    add (state, obj) {
-         state.zip.file(obj.name, obj.f)
-        return
-        return new Promise((resolve, reject) => {
-            if (!state.zip) {
-            state.zip = new JSZip() 
-            }
-            if (Object.keys(state.zip.files).length >= state.limit) {
-                if (reject) {
-                    reject(file.name)
-                }
-                return
-            }
-            fetch(file.properties.file).then(r => r.blob())
-            .then((f) => {
-                state.zip.file(file.name, f)
-                if (resolve) {
-                    resolve(file.name)
-                }
-                return true
-            })
-        })
-    },
-    clear (state) {
+    // add (state, obj) {
+    //      state.zip.file(obj.name, obj.f)
+    //     return
+    //     return new Promise((resolve, reject) => {
+    //         if (!state.zip) {
+    //         state.zip = new JSZip() 
+    //         }
+    //         if (Object.keys(state.zip.files).length >= state.limit) {
+    //             if (reject) {
+    //                 reject(file.name)
+    //             }
+    //             return
+    //         }
+    //         fetch(file.properties.file).then(r => r.blob())
+    //         .then((f) => {
+    //             state.zip.file(file.name, f)
+    //             if (resolve) {
+    //                 resolve(file.name)
+    //             }
+    //             return true
+    //         })
+    //     })
+    // },
+    clean (state) {
         state.zip.forEach(function (path) {
             state.zip.remove(path)
         })
@@ -70,7 +72,16 @@ const mutations = {
         }
     },
     download (state) {
-        state.zip.generateAsync({type:"blob"}).then(function(content) {
+        state.generating = true
+        state.zip.generateAsync({type:"blob"}, function updateCallback(metadata) {
+            console.log("progression: " + metadata.percent.toFixed(2) + " %");
+            state.progress = metadata.percent.toFixed(2)
+            if(metadata.currentFile) {
+                console.log("current file = " + metadata.currentFile);
+            }
+        }).then(function(content) {
+            state.progress = 0
+            state.generating = false
             // see FileSaver.js
             var date = moment().format('YYYYMMDDHHmmss')
             saveAs(content, "bcmt-" + date + ".zip");
@@ -94,8 +105,9 @@ const actions = {
                 return
             }
             fetch(file.properties.file).then(r => r.blob())
-            .then((f) => {
-                commit('add', {name: file.name, file: f} )
+            .then((blb) => {
+                state.zip.file(file.name, blb)
+                // commit('add', {name: file.name, file: blb} )
                
                 if (resolve) {
                     resolve(file.name)
