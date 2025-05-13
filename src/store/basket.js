@@ -29,6 +29,9 @@ const getters = {
     limit (state, getters) {
         return state.limit
     },
+    progress (state, getters) {
+        return state.progress
+    },
     size (state, getters) {
         if (!state.zip) {
             return 0

@@ -1,13 +1,18 @@
 <template>
+   
   <MapComponent :height="data.height"></MapComponent>
 </template>
 <script setup>
-import {reactive, onMounted, onBeforeUnmount} from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive } from 'vue'
+import { useStore } from 'vuex'
 import MapComponent from '../components/MapComponent.vue'
+// import { Store } from '../../node_modules_saved/vuex/dist/vuex.cjs'
 const data = reactive({
     height: 600,
     resizeListener: null
 })
+const store = useStore()
+let progress = computed(() => {return store.getters['basket/progress']})
 function initSize () {
     data.height = window.innerHeight
 }

@@ -1,12 +1,15 @@
 <script setup>
 import { RouterView } from 'vue-router'
 
-import { onBeforeUnmount, onMounted, reactive } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive } from 'vue'
+import { useStore } from 'vuex'
 import MapComponent from './components/MapComponent.vue'
 const data = reactive({
     height: 600,
     resizeListener: null
 })
+const store = useStore()
+let progress = computed(() => {return store.getters['basket/progress']})
 function initSize () {
     data.height = window.innerHeight
     
@@ -25,6 +28,11 @@ onBeforeUnmount(() => {
 
 <template>
   <nav></nav>
+   <template v-if="progress" >
+    <div class="progress" style="position:fixed;top:0;left:0;margin-top:70px;margin-left:calc(50% - 150px);z-index:10000;background:white;height:30px;">
+        <b>Generating zip</b>: {{ progress }} %
+    </div>
+  </template>
   <MapComponent :height="data.height"></MapComponent>
   <div class="page">
     <RouterView />
@@ -44,6 +52,19 @@ onBeforeUnmount(() => {
     left:0;
     width: 100%;
     z-index: 1000;
+}
+div.progress {
+    position:fixed;
+    top:0;
+    left:0;
+    margin-top:100px;
+    margin-left:calc(50% - 150px);
+    z-index:10000;
+    background:white;
+    min-height:30px;
+    padding:10px;
+    border-radius:5px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.4);
 }
 
 </style>
