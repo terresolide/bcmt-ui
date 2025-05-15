@@ -16,7 +16,7 @@
   import iconOrange from '@/assets/images/marker-icon-orange.png'
   import iconShadow from '@/assets/images/marker-shadow.png'
   import bcmtFavicon from '@/assets/images/bcmt.png'
-  import formaterreFavicon from '@/assets/images/formater.png'
+  import formaterreFavicon from '@/assets/images/favicon-96x96.png'
   // import stations from '@/data/Things-locations.json'
   import PopupComponent from './PopupComponent.vue'
   import '@/leaflet/leaflet.control.mylayers.js'
