@@ -17,7 +17,6 @@ const getters = {
         return Object.keys(state.zip.files) 
     },
     in: (state, getters) => (filename) => {
-        console.log(filename)
         if (!state.zip) {
             return false
         }

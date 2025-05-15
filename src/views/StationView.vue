@@ -20,7 +20,7 @@
       </template>
       <div class="station-form" style="margin: 10px 0;">
         <div><label style="width:60px;display:inline-block;">Start</label> <input type="date" v-model="data.start" @change="paramsChange('start')"/></div>
-       
+       <div><label>Show best available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
         <div v-if="!data.available">
         <label style="width:150px;display:inline-block;">Data type </label>
           <select v-model="data.dataType" @change="paramsChange('dataType')">
@@ -39,7 +39,7 @@
             <option v-for="item, key in data.frequencies" :value="key">{{ key }}</option>
           </select>
         </div>
-        <div><label>Show best available</label> <input type="checkbox" v-model="data.available" @change="paramsChange('available')"/></div>
+        
          <div><label style="width:60px;display:inline-block;">End</label> <input type="date" v-model="data.end" @change="paramsChange('end')"/> </div>
         <div>
           <label style="width:150px;display:inline-block;">Sampling period </label>
@@ -51,8 +51,14 @@
        
       </div>
       <div class="to-basket">
-        <button class="bcmt-button" :class="{disabled: basketSize >= basketLimit}" @click="addListToBasket()">Add list to Basket (in:{{basketSize}} &le; max:{{basketLimit}})</button></div>
-      <div class="paging">
+        <input type="checkbox" v-model="data.toBasket" style="vertical-align:top;" :disabled="data.adding || (basketSize >= basketLimit && !data.toBasket)" @change="addListToBasket()" /> 
+        <span>Add list to Basket<br>
+          <span style="font-size:0.8rem;width:auto;">Below:<b>{{ countInBasket }}</b>, in:{{basketSize}} (max:{{basketLimit}})</span>
+        </span>
+      </div>
+       <!--<button class="bcmt-button" :class="{disabled: basketSize >= basketLimit}" @click="addListToBasket()">Add list to Basket (in:{{basketSize}} &le; max:{{basketLimit}})</button></div>
+      --> 
+       <div class="paging">
         <span class="bcmt-button" :class="{disabled: data.paging.offset=== 0}" @click="first">&laquo;</span>
         <span class="bcmt-button" :class="{disabled: data.paging.offset=== 0}" @click="previous">&lsaquo;</span>
        Results:
@@ -134,7 +140,8 @@ const data= reactive({
   lastIndex: [0],
   selectedFile: null,
   resizeListener: null,
-  adding: false
+  adding: false,
+  toBasket: false
 })
 const filesNode = ref(null)
 const loading = ref(false)
@@ -145,6 +152,16 @@ const basketSize = computed(() => {
 })
 const basketLimit = computed(() => {
     return store.getters['basket/limit']
+})
+
+const countInBasket = computed(() => {
+  var count = 0
+  data.files.forEach(function(file) {
+     if(store.getters['basket/in'](file.name)) {
+      count++
+     }
+  })
+  return count
 })
 window.addEventListener('resize', initSize)
 function initSize () {
@@ -164,20 +181,27 @@ function initData () {
   data.samplings = []
 }
 function addListToBasket () {
-  var count = basketSize.value
-  var list = []
-  data.adding = true
-  for (var i=0; i < data.files.length && count < basketLimit.value; i++) {
-    console.log(i)
-    if (!store.getters['basket/in'](data.files[i].name)) {
-        list.push(store.dispatch('basket/add', data.files[i]).then(res => {return res}))
-        count++
+  if (!data.toBasket) {
+    // remove
+    for (var i=0; i < data.files.length; i++) {
+      if (store.getters['basket/in'](data.files[i].name)) {
+        store.commit('basket/remove', data.files[i].name)
+      }
     }
+  } else {
+    var count = basketSize.value
+    var list = []
+    data.adding = true
+    for (var i=0; i < data.files.length && count < basketLimit.value; i++) {
+      if (!store.getters['basket/in'](data.files[i].name)) {
+          list.push(store.dispatch('basket/add', data.files[i]).then(res => {return res}))
+          count++
+      }
+    }
+    return Promise.all(list).then((values) => {
+      data.adding = false
+    })
   }
-  return Promise.all(list).then((values) => {
-    data.adding = false
-    console.log(values)
-  })
 }
 
 function getStation () {
@@ -424,6 +448,7 @@ function getFiles () {
       if (json['@iot.count']) {
         data.total = json['@iot.count']
       }
+      data.toBasket = countInBasket.value / basketLimit.value > 0.5
       loading.value = false
     })
 }
@@ -689,7 +714,7 @@ onBeforeMount(() => {
 .station-form {
   display: grid;
  /* grid-template-columns: 100px minmax(150px,1fr) minmax(150px,1fr) 125px minmax(150px,1fr);*/
-  grid-template-columns: 0.65fr 1fr  0.65fr;
+  grid-template-columns: 0.65fr 0.65fr 1fr;
   grid-gap: 5px;
   line-height:1;
   grid-template-rows: 18px 18px; 
@@ -703,12 +728,17 @@ label {
 }
 .to-basket {
   display:inline-block;
-  width: 130px;
-  max-width: 130px;
+  width: 170px;
+  max-width: 170px;
+}
+.to-basket > span {
+  display:inline-block;
+  max-width:150px;
+  font-size:0.9rem;
 }
 .paging {
   display: inline-block;
-  width:calc(100% - 130px);
+  width:calc(100% - 170px);
   text-align:center;
   padding-bottom:3px;
 }
@@ -748,7 +778,7 @@ span.bcmt-button.disabled {
   cursor: not-allowed;
 }
 .station-page {
-  max-width: 900px;
+  max-width: 1200px;
   max-height: calc(100vh - 30px);
   height: 2000px;
   margin:  auto;
