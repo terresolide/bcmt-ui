@@ -42,6 +42,7 @@
   const data = reactive({
       map: null,
       layers: {},
+      bounds: null,
       popup: null,
       selected: {group: null, feature: null},
       stations: {
@@ -144,6 +145,7 @@
       var container = map.value
       data.map = L.map( container).setView([35, 0], 3);
       data.basketLayer = new L.Control.Basket(basket.value);
+      L.DomEvent.disableScrollPropagation(basket.value);
       data.controlLayer = new L.Control.MyLayers(null, null,{position: 'topright'})
       data.basketLayer.addTo(data.map)
       data.controlLayer.tiles.arcgisTopo.layer.addTo(data.map)    
@@ -175,8 +177,9 @@
       fetch(url)
       .then(resp => resp.json())
       .then(json => {
-          displayStations(json)
           data.map.invalidateSize()
+          displayStations(json)
+          // 
           scrollTop()
       })
       .catch(err => {
@@ -262,6 +265,12 @@
         // data.popup.setLatLng(e.latlng)
         // data.popup.openOn(data.map)
       })
+      console.log(group)
+       if (!data.bounds) {
+         data.bounds = data.layers[group].getBounds()
+       }  else {
+        data.bounds.extend(data.layers[group].getBounds())
+      }
       if (group === 'bcmtStation' || group === 'intermagnetStation') {
         data.controlLayer.addOverlay(data.layers[group], '<span class="' + group + '"> </span>' + groupName(group))
       } else {
@@ -278,6 +287,10 @@
       }
       data.layers['intermagnetObservatory'].bringToFront()
       data.layers['bcmtObservatory'].bringToFront()
+      if (data.bounds) {
+        data.map.fitBounds([[-75, -170], [65, 170]])
+        //data.map.fitWorld()
+      }
       openPopup()
      
       return

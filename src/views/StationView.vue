@@ -779,6 +779,7 @@ span.bcmt-button.disabled {
 }
 .station-page {
   max-width: 1200px;
+  width:calc(100% - 130px);
   max-height: calc(100vh - 30px);
   height: 2000px;
   margin:  auto;
