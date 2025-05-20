@@ -297,9 +297,10 @@
      
   }
   function scrollTop() {
-      console.log('scroll top')
-      var top = document.querySelector('#app')
-   
+      var top = document.querySelector('#masthead')
+      if (!top) {
+          top = document.querySelector('#app')
+      }
       if (top) {
             top.scrollIntoView({ behavior: 'smooth' });
       }
@@ -324,6 +325,10 @@
       position:relative;
       height:500px;
       width:100%;
+      z-index: 0;
+  }
+  .leaflet-touch .leaflet-bar a:first-child {
+    box-sizing: content-box;
   }
   .leaflet-bottom.leaflet-left div.leaflet-control {
       float: none;
@@ -373,8 +378,13 @@
   min-height:50px;
   display:block;
  }
-  div.icon-orange span,
-  div.icon-blue span {
+ div.leaflet-marker-icon.icon-orange,
+ div.leafelt-marker-icon.icon-blue {
+    box-sizing: border-box;
+    border-radius:3px;
+ }
+div.icon-orange span,
+div.icon-blue span {
   color: white;
   width: 13px;
   height: 13px;
@@ -384,6 +394,7 @@
   border-radius:3px;
   text-align:center;
   font-family:Arial;
+  box-sizing: content-box;
   /*background: #C45200;*/
 }
 .leaflet-popup-content {

@@ -14,7 +14,15 @@ const data = reactive({
 const store = useStore()
 let progress = computed(() => {return store.getters['basket/progress']})
 function initSize () {
-    data.height = window.innerHeight
+    console.log('initsize')
+    var node = document.querySelector('#masthead')
+    console.log(node)
+    var h = 0
+    if (node) {
+
+       h = node.offsetHeight
+    }
+    data.height = window.innerHeight - h 
 }
 onMounted(() => {
     data.resizeListener = initSize.bind()
