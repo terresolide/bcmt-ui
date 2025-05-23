@@ -4,6 +4,7 @@ import { RouterView } from 'vue-router'
 import { computed, onBeforeUnmount, onMounted, reactive } from 'vue'
 import { useStore } from 'vuex'
 import MapComponent from './components/MapComponent.vue'
+import WordpressPage from './components/WordpressPage.vue'
 const data = reactive({
     height: 600,
     resizeListener: null
@@ -41,6 +42,7 @@ onBeforeUnmount(() => {
         <b>Generating zip</b>: {{ progress }} %
     </div>
   </template>
+  <wordpress-page></wordpress-page>
   <MapComponent :height="data.height"></MapComponent>
   <div class="page">
     <RouterView />
