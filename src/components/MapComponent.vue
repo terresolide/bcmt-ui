@@ -22,6 +22,7 @@
   import '@/leaflet/leaflet.control.mylayers.js'
   import '@/leaflet/leaflet.control.logo.js'
   import '@/leaflet/leaflet.control.basket.js'
+  import '@/leaflet/leaflet.control.information.js'
   import BasketComponent from './BasketComponent.vue'
   import {reactive, ref, onMounted, watch} from 'vue'
   import { useStore } from 'vuex'
@@ -44,6 +45,7 @@
       layers: {},
       bounds: null,
       popup: null,
+      info: null,
       selected: {group: null, feature: null},
       stations: {
         bcmtObservatory: null,
@@ -153,7 +155,10 @@
       L.control.scale().addTo(data.map)
       var logo = new L.Control.logo(store.state.logo, store.state.logo === 'bcmt' ? bcmtFavicon : formaterreFavicon)
       logo.addTo(data.map)
-      
+      if (store.state.wordpress) {
+        data.info = new L.Control.Information()
+        data.info.addTo(data.map)
+      }
       data.popup = L.popup({
         autoPan:true, 
         offset: [0,-20],
@@ -315,6 +320,12 @@
    
       openPopup(route)
   });
+  // watch(store, () => {
+  //   if (store.state.wordpress && !data.info && data.map) {
+  //      data.info = new L.Control.Information()
+  //      data.info.addTo(data.map)
+  //   }
+  // })
   onMounted(() => {
         initMap()
    })

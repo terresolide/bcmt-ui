@@ -5,7 +5,8 @@ import basket from './basket.js'
 export default function makeStore(config) {
     var defaultConfig = {
         api: 'http://localhost',
-        logo: 'formaterre'
+        logo: 'formaterre',
+        wordpress: false
     }
 
     var finalConfig = Object.assign(defaultConfig, config)
@@ -13,6 +14,9 @@ export default function makeStore(config) {
     return createStore({
         state: () => finalConfig,
         mutations: {
+            setWordpress (state, value) {
+                state.wordpress = value
+            }
         },
         actions: {
         },

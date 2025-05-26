@@ -12,9 +12,7 @@ const data = reactive({
 const store = useStore()
 let progress = computed(() => {return store.getters['basket/progress']})
 function initSize () {
-     console.log('initsize')
     var node = document.querySelector('#masthead')
-    console.log(node)
     var h = 0
     if (node) {
 
@@ -42,7 +40,7 @@ onBeforeUnmount(() => {
         <b>Generating zip</b>: {{ progress }} %
     </div>
   </template>
-  <wordpress-page></wordpress-page>
+  <wordpress-page :max-height="data.height"></wordpress-page>
   <MapComponent :height="data.height"></MapComponent>
   <div class="page">
     <RouterView />

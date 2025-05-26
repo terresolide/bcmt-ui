@@ -1,29 +1,53 @@
 <template>
-  <div v-show="data.show" class="wordpress-page" @click="data.show=false">
+  <div v-show="data.show" class="wordpress-page" :style="{maxHeight: maxHeight + 'px'}" @click="data.show=false">
+
     <div class="close">&times</div>
     <h2>Information</h2>
-    <div class="wpp-content">
+    <div class="wpp-content" :style="{maxHeight: (maxHeight - 100) + 'px'}">
       <img v-if="data.img" :src="data.img"  />
       <div v-for="text in data.texts" v-html="text.innerHTML" style="margin-bottom:5px;"></div>
     </div>
   </div>
 </template>
 <script setup>
-  import {reactive, onMounted} from 'vue'
+  import {reactive, onBeforeMount, onUnmounted} from 'vue'
+  import {useRoute} from 'vue-router'
+  import {useStore} from 'vuex'
+  const {maxHeight} = defineProps({maxHeight: Number})
   const data = reactive({
     show: false,
     texts: [],
-    img: null
+    img: null,
+    clickListener: null
   })
-  onMounted(() => {
+  const store = useStore()
+  const route = useRoute()
+
+  function toggle () {
+    data.show = !data.show
+  }
+  onBeforeMount(() => {
     var texts = document.querySelectorAll('.entry-content > p.hidden')
     if (texts) {
+      store.commit('setWordpress', true)
       data.texts = texts
-      data.show = true
+      if (route.path === 'map' && !route.query.id ) {
+        data.show = true
+        console.log('SHOW.....')
+      }
+      data.clickListener = document.addEventListener('bcmt:information', toggle)
+      
     }
     var img = document.querySelector('header[id="cover"] img')
     if (img) {
       data.img = img.src
+    }
+
+  })
+  onUnmounted(() => {
+    if (data.clickListener) {
+      document.removeEventListener('bcmt:information', toggle)
+      data.clickListener = null
     }
 
   })
