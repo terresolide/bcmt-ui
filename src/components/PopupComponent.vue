@@ -67,7 +67,13 @@ const {group, feature, mode } = defineProps({
   mode: 'popup'
 })
 const router = useRouter()
-const image = computed(() =>  new URL('../assets/quicklooks/' + feature.properties.name + '.jpg', import.meta.url).href)
+const image = computed(() =>  {
+    if (feature.properties['quicklook']) {
+      return feature.properties['quicklook'].replace('http:', 'https:')
+    } else {
+      return new URL('../assets/quicklooks/' + feature.properties.name + '.jpg', import.meta.url).href
+    }
+})
 const intermagnet = computed(() =>  feature.properties.intermagnet || feature.properties.Intermagnet)
 const institutions = computed(() => feature.properties.institutions || feature.properties.Institutions)
 const status = computed(() => feature.properties.status || feature.properties.Status)
