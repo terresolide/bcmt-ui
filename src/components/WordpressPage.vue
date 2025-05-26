@@ -28,15 +28,16 @@
   }
   onBeforeMount(() => {
     var texts = document.querySelectorAll('.entry-content > p.hidden')
-    if (texts) {
+    if (texts.length > 0) {
       store.commit('setWordpress', true)
       data.texts = texts
-      if (route.path === 'map' && !route.query.id ) {
-        data.show = true
-        console.log('SHOW.....')
-      }
-      data.clickListener = document.addEventListener('bcmt:information', toggle)
-      
+     
+      data.clickListener = document.addEventListener('bcmt:information', toggle) 
+      setTimeout(function () {
+         if (route.name === 'map' && !route.query.id ) {
+          data.show = true
+        }
+      }, 100)
     }
     var img = document.querySelector('header[id="cover"] img')
     if (img) {
