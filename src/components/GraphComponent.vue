@@ -194,7 +194,7 @@ function draw (comp) {
                }
             }
             data.pointDate.date = moment.unix(this.point.x/ 1000).utc().format(formatDate)
-            var s = '<b>' + moment.unix(this.point.x/ 1000).utc().format(formatDate) + '</b><br />'
+            var s = '<b>' + moment.unix(this.point.x/ 1000).utc().format(formatDate) + ' UTC</b><br />'
             return s + values.join('<br />')
           },
           shared: false
