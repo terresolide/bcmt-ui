@@ -204,6 +204,14 @@ function draw (comp) {
            type: 'datetime',
            lineColor:'#666',
            zoomEnabled: true,
+           title: {
+            text: 'Date UTC:',
+            useHTML: true,
+           // align: 'left',
+            margin: 0,
+            x:-440,
+            y:-13
+           },
            events: {
 //              setExtremes (e) {
 //                _this.syncExtremes(e, type)
