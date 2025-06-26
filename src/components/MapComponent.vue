@@ -251,6 +251,9 @@
               return L.marker(latlng, {title: feature.properties.name, icon: icons[group]})
           } 
       }).addTo(data.map);
+      var layers = data.layers[group].getLayers()
+      
+      
       data.layers[group].on('click', function (e) {
         if (e.layer && e.layer.feature) {
           if (data.selected.feature && data.selected.feature.id === e.layer.feature.id) {
@@ -281,9 +284,15 @@
       } else {
         data.controlLayer.addOverlay(data.layers[group], '<span class="svg-' + group + '"> ' + markerSvg  + '<span> ' + groupName(group))
       }
+      var sok = layers.find(l => l.feature.properties.name === 'SOK')
+      if (sok) {
+          console.log(sok)
+          sok.setZIndexOffset(1000)
+      }
     }
   }
   function displayStations (json) {
+      
       json.value.forEach(function(st) {
         addStation(st)
       })
