@@ -178,7 +178,7 @@
   function getStations () {
     //   displayStations(stations)
     //   return
-      var url = server + '/Things?$expand=Locations($top=1)'
+      var url = server + '/Things?$expand=Locations($top=1)&$orderBy=name asc'
       fetch(url)
       .then(resp => resp.json())
       .then(json => {
