@@ -5,6 +5,10 @@
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BCMT Application</title>
+    <link rel="stylesheet" href="https://www.bcmt.fr/css/reset.css" type="text/css" media="all">
+    <link rel="stylesheet" href="https://www.bcmt.fr/css/grid.css" type="text/css" media="all">
+    <link rel="stylesheet" href="https://www.bcmt.fr/css/style.css" type="text/css" media="all">
+    <link rel="stylesheet" href="https://www.bcmt.fr/Data/bcmt_data.css" type="text/css" media="all">
     <style>
       html, body {
         margin:0;
@@ -19,11 +23,88 @@
     </style>
   </head>
   <body>
-   <header>
-    <div id="masthead" style="height:90px;">
-   <h1>Où j'ajoute des infos dans la page</h1>
-    </div>
-   </header>
+  <header>
+  <div class="main">
+    <h1><a href="index.html"><cufon class="cufon cufon-canvas" alt="BCMT" style="width: 79px; height: 30px;"><canvas width="94" height="35" style="width: 94px; height: 35px; top: -4px; left: -1px;"></canvas><cufontext>BCMT</cufontext></cufon></a></h1>
+<!--        <a href="#" class="button1">Francais</a> -->
+
+
+        <div class="inside">
+<!--          <a href="#" class="button">Login</a>-->
+            <nav>
+                <ul class="sf-menu sf-js-enabled sf-shadow">
+                    <li class="m"><a href="index.html" class="current"></a></li>
+                    <li><a href="#" class="sf-with-ul"><cufon class="cufon cufon-canvas" alt="Data" style="width: 32px; height: 14px;"><canvas width="38" height="16" style="width: 38px; height: 16px; top: -2px; left: -1px;"></canvas><cufontext>Data</cufontext></cufon><span class="sf-sub-indicator"> »</span></a>
+                        <ul style="display: block; visibility: visible;">
+                            <li>Observatory Data</li>
+                                <li class="li"><a href="data_download.php">Download</a></li>
+                                <li class="li"><a href="data_plot.php">Plot</a></li>
+                                <li class="li"><a href="data_plot_realtime.php">Realtime</a></li>
+                            <li class="last"><a href="http://www.bcmt.fr/DATABANK/MT">Electric Data</a></li>
+                            <li><a href="repeat.html">French Repeat Stations</a></li>
+                            <li class="last"><a href="archives.html">Archives</a></li>                          
+                        </ul>
+                    </li>
+                    <li><a href="#" class="sf-with-ul"><cufon class="cufon cufon-canvas" alt="Products" style="width: 67px; height: 14px;"><canvas width="75" height="16" style="width: 75px; height: 16px; top: -2px; left: -1px;"></canvas><cufontext>Products</cufontext></cufon><span class="sf-sub-indicator"> »</span></a>
+                        <ul style="display: none; visibility: hidden;">
+                            <li class="last">Geomagnetic Indices</li>
+                                <li class="li"><a href="http://isgi.unistra.fr/" target="_blank">SIIG</a></li>
+                                <li class="li"><a href="kindices.html">K-indices</a></li>
+                            <li class="last"><a href="models.html">Models</a></li>
+                            <li class="last"><a href="space_weather.html">Space Weather</a></li>
+                            <li class="last"><a href="wmmd.html">World Monthly Means</a></li>
+                        </ul>
+                    </li>                    
+                    <li><a href="#" class="sf-with-ul"><cufon class="cufon cufon-canvas" alt="Networks" style="width: 69px; height: 14px;"><canvas width="77" height="16" style="width: 77px; height: 16px; top: -2px; left: -1px;"></canvas><cufontext>Networks</cufontext></cufon><span class="sf-sub-indicator"> »</span></a>
+                        <ul style="display: none; visibility: hidden;">
+                            <li>Observatories </li>
+                                <li class="li"><a href="networks2.html">BCMT</a></li>
+                                <li class="li"><a href="intermagnet.html">INTERMAGNET</a></li>
+                             <li>Magnetometer Network</li>                                
+                             <li class="li"><a href="wamnetnetwork.html">WAMNET</a></li>
+                        <!-- <li class="li"><a href="repeatvn.html">Vietnam</a></li>-->
+                        </ul>
+                    </li>
+                    
+                    <li><a href="#" class="sf-with-ul"><cufon class="cufon cufon-canvas" alt="Publications" style="width: 87px; height: 14px;"><canvas width="95" height="16" style="width: 95px; height: 16px; top: -2px; left: -1px;"></canvas><cufontext>Publications</cufontext></cufon><span class="sf-sub-indicator"> »</span></a>
+                        <ul style="display: none; visibility: hidden;">
+                            <!--<li><a href="bulletins.html">Yearbooks</a></li>-->                      
+                            <li><a href="articles.html">Articles</a></li>
+                            <li><a href="proceedings.html">Proceedings</a></li>
+                            <li><a href="misc.html">Misc</a></li>
+                            <li class="last"><a href="archives.html">Archives</a></li>                          
+                        </ul>
+                    </li>
+                    
+<!--                    <li><a href="#">instruments</a>
+                        <ul>
+                            <li><a href="#">Test Facilities</a></li>
+                            <li><a href="#">R&D</a></li>
+                            <li><a href="#">education</a></li>
+                            <li><a href="#">Geomagnetism</a></li>  
+                            <li><a href="#">Virtual museum</a></li>  
+                            <li><a href="#">Videos</a></li>
+                        </ul>
+                        </li> -->
+                    
+                    <li><a href="#" class="sf-with-ul"><cufon class="cufon cufon-canvas" alt="About " style="width: 46px; height: 14px;"><canvas width="58" height="16" style="width: 58px; height: 16px; top: -2px; left: -1px;"></canvas><cufontext>About </cufontext></cufon><cufon class="cufon cufon-canvas" alt="Us" style="width: 17px; height: 14px;"><canvas width="25" height="16" style="width: 25px; height: 16px; top: -2px; left: -1px;"></canvas><cufontext>Us</cufontext></cufon><span class="sf-sub-indicator"> »</span></a>
+                        <ul style="display: none; visibility: hidden;">
+                            <li><a href="whatisbcmt.html">What is the BCMT?</a></li>
+                            <li><a href="institutions.html">Participating Institutions</a></li>
+
+                            <li><a href="governance.html">Governance</a></li>                         
+                            <li><a href="mission.html">Mission and Vision</a></li>
+
+                            <li><a href="history.html">History</a></li>
+                            <li><a href="location.html">Locate Us</a></li>
+                            <li><a href="contactus.php">Contact Us</a></li>  
+
+                        </ul>                    
+                </li></ul>
+            </nav>
+        </div>
+  </div>
+</header>
  <!--   <header id="cover">
             <figure class="fast-zoom-in">
                 <img width="1571" height="462" src="https://www.poleterresolide.fr/wp-content/uploads/2025/05/Chambon-1571x711-1-1571x462.jpg" class="attachment-cover size-cover wp-post-image" alt="" decoding="async">                <figcaption></figcaption>

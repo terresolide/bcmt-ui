@@ -13,6 +13,10 @@ const store = useStore()
 let progress = computed(() => {return store.getters['basket/progress']})
 function initSize () {
     var node = document.querySelector('#masthead')
+    if (store.state.logo === 'formaterre') {
+        node = document.querySelector('header')
+        node.style.height = '178px';
+    }
     var h = 0
     if (node) {
 
@@ -50,6 +54,7 @@ onBeforeUnmount(() => {
 #app {
     position:relative;
     font-family: Arial, Helvetica, sans-serif;
+    z-index:1;
 }
 .wrapper-content  div[id="app"] ul li,
 .wrapper-content  div[id="app"] ul li:last-child {
